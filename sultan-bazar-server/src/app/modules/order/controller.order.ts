@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import { response } from '../../utils/sendResponse';
 import { orderServices } from './service.order';
+import { cleanRegex } from 'zod/v4/core/util.cjs';
 
 // POST /api/orders  — logged-in user places an order
 const placeOrder = catchAsync(async (req, res) => {
@@ -90,7 +91,9 @@ const updatePaymentStatus = catchAsync(async (req, res) => {
 // PATCH /api/orders/:orderId/cancel  — logged-in user cancels their own order
 const cancelOrder = catchAsync(async (req, res) => {
     const { reason } = req.body;
+
     const result = await orderServices.cancelOrder(req.params.orderId, req.user._id, reason);
+
 
     response.createSendResponse(res, {
         statusCode: httpStatus.OK,

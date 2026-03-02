@@ -212,7 +212,11 @@ const updatePaymentStatus = async (
 
 // ── Cancel Order (by user, only if still pending) ──────────────────────────────
 const cancelOrder = async (orderId: string, userId: string, reason?: string) => {
+    console.log(orderId, userId, reason);
+
     const order = await Order.findOne({ _id: orderId, user: userId });
+    // console.log(order);
+
     if (!order) {
         throw new AppError(httpStatus.NOT_FOUND, 'Order not found', 'Order not found');
     }
