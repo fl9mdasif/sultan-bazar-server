@@ -1,22 +1,23 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const quickLinks = ["Home", "Products", "Categories", "About", "Contact", "Blog"];
 const customerService = ["My Orders", "Track Order", "Return Policy", "FAQ", "Privacy Policy"];
 
 export default function Footer() {
     return (
-        <footer className="relative text-gray-300 overflow-hidden"
-            style={{
-                backgroundImage: "url('/images/footer-image.jpg')",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                backgroundAttachment: "fixed",
-            }}
-        >
+        <footer className="relative text-gray-300">
+            {/* Background image */}
+            <Image
+                src="/images/footer-image.jpg"
+                alt="Footer background"
+                fill
+                className="object-cover object-center"
+            />
             {/* Dark overlay */}
-            <div className="absolute inset-0" style={{ background: "rgba(10,5,2,0.88)" }} />
+            <div className="absolute inset-0" style={{ background: "rgba(10, 5, 2, 0.54)" }} />
             {/* Main grid */}
-            <div className="container mx-auto px-4 lg:px-8 py-14">
+            <div className="relative z-10 container mx-auto px-4 lg:px-8 py-14">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
                     {/* Col 1 — Brand */}
                     <div>
@@ -118,7 +119,7 @@ export default function Footer() {
             </div>
 
             {/* Bottom bar */}
-            <div className="border-t border-gray-800">
+            <div className="relative z-10 border-t border-gray-700/50">
                 <div className="container mx-auto px-4 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-xs text-gray-500">
                         © 2026 Sultan Bazar. All rights reserved.
