@@ -13,7 +13,7 @@ const categories = [
 
 export default function Categories() {
     return (
-        <section className="py-14 lg:py-20" style={{ background: "#FDF6EC" }}>
+        <section className="py-8 lg:py-12" style={{ background: "#FDF6EC" }}>
             <div className="container mx-auto px-4 lg:px-8">
                 {/* Section header */}
                 <div className="text-center mb-10">

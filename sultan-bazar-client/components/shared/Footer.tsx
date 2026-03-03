@@ -5,7 +5,16 @@ const customerService = ["My Orders", "Track Order", "Return Policy", "FAQ", "Pr
 
 export default function Footer() {
     return (
-        <footer className="bg-gray-900 text-gray-300">
+        <footer className="relative text-gray-300 overflow-hidden"
+            style={{
+                backgroundImage: "url('/images/footer-image.jpg')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundAttachment: "fixed",
+            }}
+        >
+            {/* Dark overlay */}
+            <div className="absolute inset-0" style={{ background: "rgba(10,5,2,0.88)" }} />
             {/* Main grid */}
             <div className="container mx-auto px-4 lg:px-8 py-14">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">

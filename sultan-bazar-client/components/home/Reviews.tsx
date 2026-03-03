@@ -91,7 +91,7 @@ export default function Reviews() {
     const doubled = [...reviews, ...reviews];
 
     return (
-        <section className="py-14 lg:py-20 overflow-hidden" style={{ background: "#FDF6EC" }}>
+        <section className="py-8 lg:py-12 overflow-hidden" style={{ background: "#FDF6EC" }}>
             <div className="container mx-auto px-4 lg:px-8 mb-10">
                 <div className="text-center">
                     <p className="text-sm font-semibold uppercase tracking-widest mb-2" style={{ color: "#D4860A" }}>

@@ -15,7 +15,7 @@ export default function Newsletter() {
     };
 
     return (
-        <section className="py-14 lg:py-20">
+        <section className="py-8 lg:py-12">
             <div className="container mx-auto px-4 lg:px-8">
                 <div
                     className="rounded-3xl px-8 py-12 lg:px-16 lg:py-14 text-center relative overflow-hidden"

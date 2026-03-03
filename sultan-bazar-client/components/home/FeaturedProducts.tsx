@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Heart, Star, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -210,36 +211,85 @@ function ProductCard({ product }: { product: Product }) {
 
 export default function FeaturedProducts() {
     return (
-        <section className="py-14 lg:py-20 bg-white">
-            <div className="container mx-auto px-4 lg:px-8">
-                {/* Section header */}
-                <div className="text-center mb-10">
-                    <p className="text-sm font-semibold uppercase tracking-widest mb-2" style={{ color: "#D4860A" }}>
-                        Top Picks
-                    </p>
-                    <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
-                        Our <span style={{ color: "#B5451B" }}>Best Sellers</span>
+        <>
+            {/* ── Products Section with bg image ── */}
+            <section
+                className="py-8 lg:py-12 relative"
+                style={{
+                    backgroundImage: "url('/images/product-section-bg-img_1.jpg')",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundAttachment: "fixed",
+                }}
+            >
+                {/* Light overlay so cards stay readable */}
+                <div className="absolute inset-0" style={{ background: "rgba(253,246,236,0.93)" }} />
+
+                <div className="relative z-10 container mx-auto px-4 lg:px-8">
+                    {/* Section header */}
+                    <div className="text-center mb-10">
+                        <p className="text-sm font-semibold uppercase tracking-widest mb-2" style={{ color: "#D4860A" }}>
+                            Top Picks
+                        </p>
+                        <h2 className="text-3xl lg:text-4xl font-bold text-gray-900">
+                            Our <span style={{ color: "#B5451B" }}>Best Sellers</span>
+                        </h2>
+                        <p className="text-gray-600 mt-2">Loved by thousands of Bangladeshi families</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
+                        {products.map((p) => (
+                            <ProductCard key={p.id} product={p} />
+                        ))}
+                    </div>
+
+                    <div className="text-center mt-10">
+                        <Link href="/products">
+                            <Button
+                                size="lg"
+                                className="rounded-full px-10 font-semibold text-white"
+                                style={{ background: "#B5451B" }}
+                            >
+                                View All Products →
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+            {/* ── Parallax Banner ── */}
+            <div
+                className="relative py-14 lg:py-20 text-center overflow-hidden"
+                style={{
+                    backgroundImage: "url('/images/parallax-full-width.jpg')",
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundAttachment: "fixed",
+                }}
+            >
+                <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.58)" }} />
+                <div className="relative z-10 container mx-auto px-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.3em] mb-3" style={{ color: "#D4860A" }}>Limited Time Offer</p>
+                    <h2 className="text-3xl lg:text-5xl font-bold text-white mb-3 drop-shadow-lg">
+                        Get <span style={{ color: "#F5D078" }}>20% OFF</span> Sitewide
                     </h2>
-                    <p className="text-gray-500 mt-2">Loved by thousands of Bangladeshi families</p>
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 lg:gap-5">
-                    {products.map((p) => (
-                        <ProductCard key={p.id} product={p} />
-                    ))}
-                </div>
-
-                <div className="text-center mt-10">
-                    <Button
-                        variant="outline"
-                        size="lg"
-                        className="rounded-full px-10 font-semibold"
-                        style={{ borderColor: "#B5451B", color: "#B5451B" }}
-                    >
-                        View All Products →
-                    </Button>
+                    <div className="flex items-center justify-center gap-3 mb-6">
+                        <div className="h-px w-16" style={{ background: "#D4860A" }} />
+                        <span className="text-white/80 text-sm tracking-widest uppercase">Use Coupon</span>
+                        <div className="h-px w-16" style={{ background: "#D4860A" }} />
+                    </div>
+                    <div className="inline-block bg-white/15 backdrop-blur-sm border border-white/30 rounded-2xl px-8 py-3 mb-6">
+                        <span className="text-2xl font-bold tracking-[0.25em] text-white">SULTAN20</span>
+                    </div>
+                    <div className="block">
+                        <Link href="/products"
+                            className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-bold text-sm hover:scale-105 transition-transform"
+                            style={{ background: "linear-gradient(135deg, #B5451B, #D4860A)", color: "white" }}>
+                            Shop Now →
+                        </Link>
+                    </div>
                 </div>
             </div>
-        </section>
+        </>
     );
 }

@@ -42,7 +42,7 @@ const healthProducts = [
 
 export default function HealthProducts() {
     return (
-        <section className="py-14 lg:py-20 bg-white">
+        <section className="py-8 lg:py-12 bg-white">
             <div className="container mx-auto px-4 lg:px-8">
                 {/* Header */}
                 <div className="text-center mb-12">

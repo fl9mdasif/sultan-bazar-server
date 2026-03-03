@@ -299,8 +299,8 @@ export default function ProductsPage() {
     return (
         <div className="min-h-screen" style={{ background: "#FAFAF8" }}>
             {/* ── Page Header ── */}
-            <div style={{ background: "linear-gradient(135deg, #FDF6EC, #FEF3CD)" }} className="py-5 lg:py-6 border-b flex justify-center items-center border-orange-100">
-                <div className="container mx-auto px-4 lg:px-8 text-left">
+            <div style={{ background: "linear-gradient(135deg, #FDF6EC, #FEF3CD)" }} className="py-6 lg:py-8 border-b border-orange-100">
+                <div className="container mx-auto px-4 lg:px-8 text-center">
                     <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: "#D4860A" }}>
                         Our Store
                     </p>
