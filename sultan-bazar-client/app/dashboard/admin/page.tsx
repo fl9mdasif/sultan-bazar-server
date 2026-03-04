@@ -61,7 +61,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Quick links */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+            {/* <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
                 <h2 className="text-base font-semibold text-gray-900 mb-4">Quick Actions</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {quickLinks.map((link) => (
@@ -77,7 +77,7 @@ export default function AdminDashboard() {
                         </Link>
                     ))}
                 </div>
-            </div>
+            </div> */}
 
             {/* Recent reviews placeholder */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">

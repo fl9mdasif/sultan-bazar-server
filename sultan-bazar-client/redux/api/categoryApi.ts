@@ -1,62 +1,68 @@
-// import { get } from "http";
 import { tagTypes } from "../tag-types";
 import { baseApi } from "./baseApi";
 
-const blogApi = baseApi.injectEndpoints({
+const categoryApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    createBlog: build.mutation({
+    createCategory: build.mutation({
       query: (data) => ({
-        url: "/blogs/create-blog",
+        url: "/categories",
         method: "POST",
-        contentType: "application/json",
         data,
       }),
-      invalidatesTags: [tagTypes.blogs],
+      invalidatesTags: [tagTypes.categories]
     }),
 
-    getAllBlogs: build.query({
-      // query: (arg: Record<string, any>) => ({
+    getAllCategories: build.query({
       query: () => ({
-        url: "/blogs",
+        url: "/categories",
         method: "GET",
-        // params: arg,
       }),
-      providesTags: [tagTypes.blogs],
+      providesTags: [tagTypes.categories]
     }),
 
-    getSingleBlog: build.query({
-      query: (id) => (
-        console.log("singleId", id),
-        {
-          url: `/blogs/${id}`,
-          method: "GET",
-        }
-      ),
+    getSingleCategory: build.query({
+      query: (id) => ({
+        url: `/categories/${id}`,
+        method: "GET",
+      }),
+      providesTags: [tagTypes.categories]
     }),
 
-    updateBlog: build.mutation({
+    updateCategory: build.mutation({
       query: ({ id, data }) => ({
-        url: `/blogs/${id}`,
+        url: `/categories/${id}`,
         method: "PATCH",
         data,
       }),
-      invalidatesTags: [tagTypes.blogs],
+      invalidatesTags: [tagTypes.categories]
+
     }),
 
-    deleteBlog: build.mutation({
+    toggleCategoryStatus: build.mutation({
       query: (id) => ({
-        url: `/blogs/${id}`,
+        url: `/categories/${id}/toggle-status`,
+        method: "PATCH",
+      }),
+      invalidatesTags: [tagTypes.categories]
+
+    }),
+
+    deleteCategory: build.mutation({
+      query: (id) => ({
+        url: `/categories/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: [tagTypes.blogs],
+      invalidatesTags: [tagTypes.categories]
+
     }),
   }),
 });
 
 export const {
-  useCreateBlogMutation,
-  useGetAllBlogsQuery,
-  useGetSingleBlogQuery,
-  useUpdateBlogMutation,
-  useDeleteBlogMutation,
-} = blogApi;
+  useCreateCategoryMutation,
+  useGetAllCategoriesQuery,
+  useGetSingleCategoryQuery,
+  useUpdateCategoryMutation,
+  useToggleCategoryStatusMutation,
+  useDeleteCategoryMutation,
+} = categoryApi;

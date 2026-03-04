@@ -1,50 +1,71 @@
 import { tagTypes } from "../tag-types";
 import { baseApi } from "./baseApi";
 
-const ProjectApi = baseApi.injectEndpoints({
+const productApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    createProject: build.mutation({
-      query: (data) => ({
-        url: "/products",
-        method: "POST",
-        contentType: "application/json",
-        data,
-      }),
-      invalidatesTags: [tagTypes.products],
-    }),
 
-    getAllProjects: build.query({
-      // query: (arg: Record<string, any>) => ({
-      query: () => ({
-        url: "/projects",
+    // GET /products — public with filters
+    getAllProducts: build.query({
+      query: (params?: Record<string, unknown>) => ({
+        url: "/products",
         method: "GET",
-        // params: arg,
+        params,
       }),
       providesTags: [tagTypes.products],
     }),
 
-    getSingleProject: build.query({
-      query: (projectId) => (
-        console.log("singleId", projectId),
-        {
-          url: `/projects/${projectId}`,
-          method: "GET",
-        }
-      ),
+    // GET /products/:id
+    getSingleProduct: build.query({
+      query: (id: string) => ({
+        url: `/products/${id}`,
+        method: "GET",
+      }),
+      providesTags: [tagTypes.products],
     }),
 
-    updateProject: build.mutation({
-      query: ({ id, data }) => ({
-        url: `/projects/${id}`,
-        method: "PUT",
+    // POST /products — admin/superAdmin
+    createProduct: build.mutation({
+      query: (data) => ({
+        url: "/products",
+        method: "POST",
         data,
       }),
       invalidatesTags: [tagTypes.products],
     }),
 
-    deleteProject: build.mutation({
-      query: (id) => ({
-        url: `/projects/${id}`,
+    // PATCH /products/:id — admin/superAdmin
+    updateProduct: build.mutation({
+      query: ({ id, data }: { id: string; data: unknown }) => ({
+        url: `/products/${id}`,
+        method: "PATCH",
+        data,
+      }),
+      invalidatesTags: [tagTypes.products],
+    }),
+
+    // PATCH /products/:id/toggle-featured
+    toggleFeatured: build.mutation({
+      query: (id: string) => ({
+        url: `/products/${id}/toggle-featured`,
+        method: "PATCH",
+      }),
+      invalidatesTags: [tagTypes.products],
+    }),
+
+    // PATCH /products/:productId/variants/:variantId
+    updateVariant: build.mutation({
+      query: ({ productId, variantId, data }: { productId: string; variantId: string; data: unknown }) => ({
+        url: `/products/${productId}/variants/${variantId}`,
+        method: "PATCH",
+        data,
+      }),
+      invalidatesTags: [tagTypes.products],
+    }),
+
+    // DELETE /products/:id — admin/superAdmin
+    deleteProduct: build.mutation({
+      query: (id: string) => ({
+        url: `/products/${id}`,
         method: "DELETE",
       }),
       invalidatesTags: [tagTypes.products],
@@ -53,9 +74,11 @@ const ProjectApi = baseApi.injectEndpoints({
 });
 
 export const {
-  useCreateProjectMutation,
-  useGetAllProjectsQuery,
-  useGetSingleProjectQuery,
-  useUpdateProjectMutation,
-  useDeleteProjectMutation
-} = ProjectApi;
+  useGetAllProductsQuery,
+  useGetSingleProductQuery,
+  useCreateProductMutation,
+  useUpdateProductMutation,
+  useToggleFeaturedMutation,
+  useUpdateVariantMutation,
+  useDeleteProductMutation,
+} = productApi;

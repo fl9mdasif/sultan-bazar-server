@@ -6,13 +6,14 @@ import { usePathname, useRouter } from "next/navigation";
 import { getUserInfo, removeUser } from "@/services/auth.services";
 import {
     LayoutDashboard, Package, ShoppingCart, Users, Settings,
-    LogOut, Heart, MapPin, Menu, X, ChevronRight, Shield,
+    LogOut, Heart, MapPin, Menu, X, ChevronRight, Shield, Tags
 } from "lucide-react";
 
 // ─── Nav config per role ──────────────────────────────────────────────────────
 const navByRole: Record<string, { label: string; href: string; icon: React.ElementType }[]> = {
     admin: [
         { label: "Dashboard", href: "/dashboard/admin", icon: LayoutDashboard },
+        { label: "Categories", href: "/dashboard/admin/categories", icon: Tags },
         { label: "Products", href: "/dashboard/admin/products", icon: Package },
         { label: "Orders", href: "/dashboard/admin/orders", icon: ShoppingCart },
         { label: "Users", href: "/dashboard/admin/users", icon: Users },
@@ -20,6 +21,7 @@ const navByRole: Record<string, { label: string; href: string; icon: React.Eleme
     ],
     superadmin: [
         { label: "Dashboard", href: "/dashboard/superadmin", icon: LayoutDashboard },
+        { label: "Categories", href: "/dashboard/admin/categories", icon: Tags },
         { label: "Products", href: "/dashboard/superadmin/products", icon: Package },
         { label: "Orders", href: "/dashboard/superadmin/orders", icon: ShoppingCart },
         { label: "Users", href: "/dashboard/superadmin/users", icon: Users },

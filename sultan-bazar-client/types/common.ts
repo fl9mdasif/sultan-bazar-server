@@ -24,41 +24,48 @@ export type IGenericErrorMessage = {
   message: string;
 };
 
-export interface TProject {
-  _id?: string
-  title: string;
-  description: string;
-  technologies: string[];
-  category: 'Frontend' | 'Backend' | 'Database' | 'DevOps' | 'Tool' | 'Language' | 'AI'| string;
-  githubClient?: string;
-  githubServer?: string;
-  liveUrl?: string;
-  image?: string;
-  gallery?: string[];
-  status?: 'Live' | 'In Development' | 'On Hold' | 'Completed' | string;
-  createdAt: string;
-  updatedAt: string;
-}
 
-export interface Skill {
-  id: string;
+
+
+
+
+
+// ─── Category Types ──────────────────────────────────────────────────────────
+
+export interface TCategory {
+  _id: string;
   name: string;
-  icon?: string;
-  category: 'Frontend' | 'Backend' | 'Database' | 'DevOps' | 'Tool' | 'Language' | 'AI' |string;
-  level?: 'Beginner' | 'Intermediate' | 'Advanced' ;
-  createdAt: string;
-  updatedAt: string;
+  slug: string;
+  description?: string;
+  isActive: boolean;
+  order: number;
 }
 
-export interface TBlog {
+// ─── Product Types ────────────────────────────────────────────────────────────
+
+export interface TVariant {
   _id?: string;
-  title: string;
+  name: string;
+  sku: string;
+  price: number;
+  discountPrice?: number;
+  stock: number;
+  weight?: number;
+  isAvailable?: boolean;
+}
+
+export interface TProduct {
+  _id: string;
+  name: string;
+  slug: string;
   description: string;
-  coverImage?: string;
-  status?: 'Draft' | 'Published' | 'Archived' | string;
-  author?: string;
-  likes?: number;
-  published: boolean;
-  createdAt: string;
-  updatedAt: string;
+  category: string;
+  tags?: string[];
+  thumbnail: string;
+  gallery?: string[];
+  variants: TVariant[];
+  rating?: number;
+  reviewCount?: number;
+  status?: "active" | "draft" | "archived";
+  isFeatured?: boolean;
 }
