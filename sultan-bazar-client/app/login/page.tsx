@@ -5,6 +5,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { loginUser } from "@/services/actions/loginUser";
+import { storeUserInfo } from "@/services/auth.services";
+import { toast } from "sonner";
 
 export default function LoginPage() {
     const [email, setEmail] = useState("");
@@ -12,6 +15,7 @@ export default function LoginPage() {
     const [showPass, setShowPass] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [serverError, setServerError] = useState("");
 
     const validate = () => {
         const e: Record<string, string> = {};
@@ -27,10 +31,24 @@ export default function LoginPage() {
         const errs = validate();
         if (Object.keys(errs).length) { setErrors(errs); return; }
         setErrors({});
+        setServerError("");
         setLoading(true);
-        // Simulate API call
-        await new Promise((r) => setTimeout(r, 1500));
-        setLoading(false);
+
+        try {
+            const res = await loginUser({ email, password });
+
+            if (res?.data?.accessToken) {
+                storeUserInfo({ accessToken: res.data.accessToken });
+                toast.success(res?.message || "Welcome back!");
+                window.location.href = "/dashboard";
+            } else {
+                setServerError(res?.message || "Invalid email or password.");
+            }
+        } catch {
+            setServerError("Something went wrong. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -76,7 +94,7 @@ export default function LoginPage() {
                             {[1, 2, 3, 4, 5].map((i) => <span key={i} className="text-yellow-400 text-sm">★</span>)}
                         </div>
                         <p className="text-white text-sm leading-relaxed italic">
-                            "Sultan Bazar spices have transformed my cooking. The quality is unmatched and delivery is always on time!"
+                            &quot;Sultan Bazar spices have transformed my cooking. The quality is unmatched and delivery is always on time!&quot;
                         </p>
                         <p className="text-orange-200 text-xs mt-3 font-semibold">— Fatima Rahman, Dhaka</p>
                     </div>
@@ -99,12 +117,18 @@ export default function LoginPage() {
                     <div className="mb-8">
                         <h1 className="text-3xl font-bold text-gray-900 mb-1">Sign in</h1>
                         <p className="text-gray-500 text-sm">
-                            Don't have an account?{" "}
+                            Don&apos;t have an account?{" "}
                             <Link href="/signup" className="font-semibold hover:underline" style={{ color: "#B5451B" }}>
                                 Create one
                             </Link>
                         </p>
                     </div>
+
+                    {serverError && (
+                        <div className="mb-5 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm font-medium text-red-600">
+                            {serverError}
+                        </div>
+                    )}
 
                     <form onSubmit={handleSubmit} className="space-y-5" noValidate>
                         {/* Email */}

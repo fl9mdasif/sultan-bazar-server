@@ -26,6 +26,7 @@ export interface TUser {
   username: string;
   email: string;
   contactNumber: string;
+  address?: string;
   password: string;
   role: 'user' | 'admin' | 'superAdmin';
   passwordChangedAt?: Date;

@@ -22,7 +22,9 @@ const userRegistrationValidation = z.object({
     username: z.string().min(1).max(50),
     email: z.string().email(),
     password: z.string().min(6).max(30),
-    role: z.enum(['user', 'admin', 'superAdmin']),
+    role: z.enum(['user', 'admin', 'superAdmin']).default('user'),
+    contactNumber: z.string().optional(),
+    address: z.string().optional(),
   }),
 });
 

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
+import StoreProvider from "@/redux/StoreProvider";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "Sultan Bazar — রান্নাঘরের বিশ্বস্ত সঙ্গী",
@@ -16,9 +18,12 @@ export default function RootLayout({
   return (
     <html lang="bn">
       <body className="antialiased">
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <StoreProvider>
+          <Toaster position="top-right" richColors />
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+        </StoreProvider>
       </body>
     </html>
   );

@@ -16,7 +16,11 @@ const userSchema = new Schema<TUser, UserModel>(
     },
     contactNumber: {
       type: String,
-      required: true,
+      required: false,
+    },
+    address: {
+      type: String,
+      required: false,
     },
     password: {
       type: String,
@@ -26,7 +30,7 @@ const userSchema = new Schema<TUser, UserModel>(
     role: {
       type: String,
       enum: ['user', 'admin', 'superAdmin'],
-      required: true,
+      default: 'user',
     },
 
     passwordChangedAt: { type: Date },

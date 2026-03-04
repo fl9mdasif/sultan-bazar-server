@@ -3,15 +3,22 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowRight, Loader2, CheckCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff, Mail, Lock, User, Phone, MapPin, ArrowRight, Loader2, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { registerUser } from "@/services/actions/registerUser";
+import { loginUser } from "@/services/actions/loginUser";
+import { storeUserInfo } from "@/services/auth.services";
+import { toast } from "sonner";
 
 export default function SignUpPage() {
-    const [form, setForm] = useState({ name: "", email: "", phone: "", password: "", confirm: "" });
+    const router = useRouter();
+    const [form, setForm] = useState({ name: "", email: "", phone: "", address: "", password: "", confirm: "" });
     const [showPass, setShowPass] = useState(false);
     const [loading, setLoading] = useState(false);
     const [done, setDone] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [serverError, setServerError] = useState("");
 
     const set = (k: string) => (e: React.ChangeEvent<HTMLInputElement>) =>
         setForm((f) => ({ ...f, [k]: e.target.value }));
@@ -32,10 +39,39 @@ export default function SignUpPage() {
         const errs = validate();
         if (Object.keys(errs).length) { setErrors(errs); return; }
         setErrors({});
+        setServerError("");
         setLoading(true);
-        await new Promise((r) => setTimeout(r, 1500));
-        setLoading(false);
-        setDone(true);
+
+        try {
+            const payload = {
+                username: form.name,
+                email: form.email,
+                password: form.password,
+                contactNumber: form.phone,
+                address: form.address,
+
+            };
+            const res = await registerUser(payload);
+
+            if (res?.success || res?.data) {
+                // Auto-login after successful registration
+                const loginRes = await loginUser({ email: form.email, password: form.password });
+                if (loginRes?.data?.accessToken) {
+                    storeUserInfo({ accessToken: loginRes.data.accessToken });
+                    toast.success("Account created! Welcome to Sultan Bazar 🎉");
+                    window.location.href = "/dashboard";
+                } else {
+                    // Registration succeeded but auto-login failed — send to login page
+                    setDone(true);
+                }
+            } else {
+                setServerError(res?.message || "Registration failed. Please try again.");
+            }
+        } catch {
+            setServerError("Something went wrong. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const strength = (() => {
@@ -138,6 +174,12 @@ export default function SignUpPage() {
                                 </p>
                             </div>
 
+                            {serverError && (
+                                <div className="mb-5 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm font-medium text-red-600">
+                                    {serverError}
+                                </div>
+                            )}
+
                             <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                                 {/* Name */}
                                 <div>
@@ -167,6 +209,16 @@ export default function SignUpPage() {
                                     <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-white focus-within:border-[#B5451B] transition-colors">
                                         <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
                                         <input type="tel" value={form.phone} onChange={set("phone")} placeholder="+880 1xxx-xxxxxx"
+                                            className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-300" />
+                                    </div>
+                                </div>
+
+                                {/* Address */}
+                                <div>
+                                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5 block">Address</label>
+                                    <div className="flex items-center gap-3 border border-gray-200 rounded-xl px-4 py-3 bg-white focus-within:border-[#B5451B] transition-colors">
+                                        <MapPin className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                                        <input type="text" value={form.address} onChange={set("address")} placeholder="Dhaka, Bangladesh"
                                             className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-300" />
                                     </div>
                                 </div>
