@@ -146,6 +146,7 @@ const getAllOrders = async (query: Record<string, unknown>) => {
     const [orders, total] = await Promise.all([
         Order.find(filter)
             .populate('user', 'name email phone')
+            .populate('items.product', 'name thumbnail slug')
             .sort({ createdAt: -1 })
             .skip((pageNum - 1) * limitNum)
             .limit(limitNum),

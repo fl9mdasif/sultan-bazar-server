@@ -69,3 +69,71 @@ export interface TProduct {
   status?: "active" | "draft" | "archived";
   isFeatured?: boolean;
 }
+
+// ─── Order Types ──────────────────────────────────────────────────────────────
+
+export type TPaymentMethod = "cod" | "bkash" | "nagad" | "card" | "bank";
+export type TPaymentStatus = "pending" | "paid" | "failed" | "refunded";
+export type TOrderStatus =
+  | "pending"
+  | "confirmed"
+  | "processing"
+  | "shipped"
+  | "delivered"
+  | "cancelled"
+  | "returned";
+
+export interface TOrderVariantSnapshot {
+  variantId: string;
+  name: string;
+  sku: string;
+  price: number;
+  discountPrice?: number;
+}
+
+export interface TOrderItem {
+  _id?: string;
+  product: string | TProduct;
+  variant: TOrderVariantSnapshot;
+  quantity: number;
+  totalPrice: number;
+}
+
+export interface TShippingAddress {
+  fullName: string;
+  phone: string;
+  address: string;
+  city: string;
+  district: string;
+  postalCode?: string;
+  country?: string;
+}
+
+export interface TStatusHistoryEntry {
+  status: TOrderStatus;
+  note?: string;
+  changedAt?: string;
+}
+
+export interface TOrder {
+  _id: string;
+  user: any; // User type can be added later
+  orderNumber: string;
+  items: TOrderItem[];
+  shippingAddress: TShippingAddress;
+  paymentMethod: TPaymentMethod;
+  paymentStatus?: TPaymentStatus;
+  transactionId?: string;
+  subtotal: number;
+  shippingCharge?: number;
+  discount?: number;
+  totalAmount: number;
+  orderStatus: TOrderStatus;
+  statusHistory: TStatusHistoryEntry[];
+  deliveredAt?: string;
+  cancelledAt?: string;
+  cancelReason?: string;
+  note?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
