@@ -25,7 +25,7 @@ const navByRole: Record<string, { label: string; href: string; icon: React.Eleme
         { label: "Products", href: "/dashboard/superadmin/products", icon: Package },
         { label: "Orders", href: "/dashboard/superadmin/orders", icon: ShoppingCart },
         { label: "Users", href: "/dashboard/superadmin/users", icon: Users },
-        { label: "Roles", href: "/dashboard/superadmin/roles", icon: Shield },
+        // { label: "Roles", href: "/dashboard/superadmin/roles", icon: Shield },
         { label: "Settings", href: "/dashboard/superadmin/settings", icon: Settings },
     ],
     user: [

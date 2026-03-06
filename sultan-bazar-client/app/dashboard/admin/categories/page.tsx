@@ -184,9 +184,18 @@ export default function AdminCategoriesPage() {
                                     <tr key={c._id} className="hover:bg-gray-50/50 transition-colors">
                                         {/* Category Info */}
                                         <td className="px-5 py-4">
-                                            <div className="flex flex-col">
-                                                <span className="font-semibold text-gray-900">{c.name}</span>
-                                                <span className="text-xs text-gray-400">/{c.slug}</span>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center flex-shrink-0 overflow-hidden border border-gray-100">
+                                                    {(c as any).thumbnail ? (
+                                                        <img src={(c as any).thumbnail} alt={c.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <Tags className="w-4 h-4 text-gray-300" />
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="font-semibold text-gray-900">{c.name}</span>
+                                                    <span className="text-xs text-gray-400">/{c.slug}</span>
+                                                </div>
                                             </div>
                                         </td>
 

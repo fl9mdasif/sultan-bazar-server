@@ -13,7 +13,7 @@ const quickLinks = [
     { label: "Manage Products", href: "/dashboard/superadmin/products", icon: Package },
     { label: "All Orders", href: "/dashboard/superadmin/orders", icon: ShoppingCart },
     { label: "Manage Users", href: "/dashboard/superadmin/users", icon: Users },
-    { label: "Role Management", href: "/dashboard/superadmin/roles", icon: Shield },
+    // { label: "Role Management", href: "/dashboard/superadmin/roles", icon: Shield },
     { label: "Analytics", href: "/dashboard/superadmin/analytics", icon: TrendingUp },
     { label: "Site Settings", href: "/dashboard/superadmin/settings", icon: Settings },
 ];
@@ -30,8 +30,7 @@ export default function SuperAdminDashboard() {
 
     const totalProducts = productsData?.meta?.total || productsData?.data?.meta?.total || productsData?.data?.total || 0;
     const totalCommands = ordersData?.meta?.total || ordersData?.data?.meta?.total || ordersData?.data?.total || ordersData?.data?.length || ordersData?.length || 0;
-    const totalUsers = usersData?.meta?.total || usersData?.data?.meta?.total || usersData?.data?.total || 0;
-
+    const totalUsers = usersData?.total || 0
     const ordersArray = ordersData?.data?.data || ordersData?.data || ordersData || [];
     const revenue = Array.isArray(ordersArray)
         ? ordersArray.reduce((acc: number, order: any) => acc + (order.totalAmount || 0), 0)
@@ -41,7 +40,7 @@ export default function SuperAdminDashboard() {
         { label: "Total Products", value: totalProducts, icon: Package, color: "#B5451B" },
         { label: "Total Orders", value: totalCommands, icon: ShoppingCart, color: "#D4860A" },
         { label: "Total Users", value: totalUsers, icon: Users, color: "#16a34a" },
-        { label: "Revenue", value: `৳${revenue.toLocaleString()}`, icon: TrendingUp, color: "#7c3aed" },
+        // { label: "Revenue", value: `৳${revenue.toLocaleString()}`, icon: TrendingUp, color: "#7c3aed" },
     ];
 
     useEffect(() => {

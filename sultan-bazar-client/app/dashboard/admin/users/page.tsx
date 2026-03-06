@@ -330,16 +330,18 @@ export default function AdminUsersPage() {
                                                     <button
                                                         onClick={() => handleToggleBlock(user)}
                                                         title={user.isBlocked ? "Unblock user" : "Block user"}
-                                                        className={`p-1.5 rounded-lg transition-colors ${user.isBlocked ? "hover:bg-green-50 text-green-500" : "hover:bg-orange-50 text-gray-400 hover:text-orange-500"}`}
+                                                        className={`px-3 py-1.5 text-[11px] font-bold rounded-lg transition-colors flex items-center gap-1.5 ${user.isBlocked ? "bg-green-100 text-green-700 hover:bg-green-200" : "bg-orange-100 text-orange-700 hover:bg-orange-200"}`}
                                                     >
                                                         {user.isBlocked ? <ShieldCheck className="w-3.5 h-3.5" /> : <ShieldOff className="w-3.5 h-3.5" />}
+                                                        {user.isBlocked ? "Unblock" : "Block"}
                                                     </button>
                                                     <button
                                                         onClick={() => setDeleteTarget(user)}
                                                         title="Delete user"
-                                                        className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors"
+                                                        className="px-3 py-1.5 text-[11px] font-bold rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition-colors flex items-center gap-1.5"
                                                     >
                                                         <Trash2 className="w-3.5 h-3.5" />
+                                                        Delete
                                                     </button>
                                                 </div>
                                             </td>
