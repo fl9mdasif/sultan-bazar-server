@@ -12,14 +12,8 @@ import {
     Loader2,
     AlertTriangle,
     Package,
-    Calendar,
-    CreditCard,
-    MapPin,
     X,
-    CheckCircle2,
-    Clock,
-    XCircle,
-    Truck,
+    ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -27,246 +21,25 @@ import type { TOrder, TOrderStatus, TPaymentStatus } from "@/types/common";
 import Image from "next/image";
 
 // ── Helpers ─────────────────────────────────────────────────────────────
-const STATUS_COLORS: Record<TOrderStatus, string> = {
-    pending: "bg-yellow-100 text-yellow-800",
-    confirmed: "bg-blue-100 text-blue-800",
-    processing: "bg-purple-100 text-purple-800",
-    shipped: "bg-indigo-100 text-indigo-800",
-    delivered: "bg-green-100 text-green-800",
-    cancelled: "bg-red-100 text-red-800",
-    returned: "bg-gray-100 text-gray-800",
-};
+import { OrderDetailsModal, STATUS_COLORS, PAYMENT_STATUS_COLORS, formatDate } from "./order.modal";
 
-const PAYMENT_STATUS_COLORS: Record<TPaymentStatus, string> = {
-    pending: "bg-yellow-100 text-yellow-800",
-    paid: "bg-green-100 text-green-800",
-    failed: "bg-red-100 text-red-800",
-    refunded: "bg-gray-100 text-gray-800",
-};
 
-const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-    });
-};
+// ── Search field config ───────────────────────────────────────────────────────
+type OrderSearchField = "orderNumber" | "customerName" | "phone";
 
-// ── Order Details Modal ──────────────────────────────────────────────────────
-function OrderDetailsModal({
-    open,
-    onClose,
-    order,
-}: {
-    open: boolean;
-    onClose: () => void;
-    order: TOrder | null;
-}) {
-    if (!open || !order) return null;
-
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
-                {/* Header */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 border-b gap-4">
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-900">
-                            Order #{order.orderNumber}
-                        </h2>
-                        <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
-                            <Calendar className="w-4 h-4" />
-                            {formatDate(order.createdAt || new Date().toISOString())}
-                        </div>
-                    </div>
-                    <button
-                        onClick={onClose}
-                        className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 self-end sm:self-auto"
-                    >
-                        <X className="w-5 h-5" />
-                    </button>
-                </div>
-
-                {/* Body */}
-                <div className="overflow-y-auto flex-1 p-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Left Column: Items */}
-                        <div className="lg:col-span-2 space-y-6">
-                            <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-                                <div className="px-4 py-3 bg-gray-50/50 border-b border-gray-100 font-medium text-gray-700">
-                                    Order Items ({order.items.length})
-                                </div>
-                                <div className="divide-y divide-gray-100">
-                                    {order.items.map((item, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="p-4 flex items-center gap-4 hover:bg-gray-50/50 transition-colors"
-                                        >
-                                            <div className="w-16 h-16 rounded-lg bg-gray-100 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                                                {(item.product as any)?.thumbnail ? (
-                                                    <Image
-                                                        src={(item.product as any).thumbnail}
-                                                        alt={item.variant.name}
-                                                        width={64}
-                                                        height={64}
-                                                        className="object-cover w-full h-full"
-                                                    />
-                                                ) : (
-                                                    <Package className="w-6 h-6 text-gray-400" />
-                                                )}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <p className="font-semibold text-gray-900 truncate">
-                                                    {(item.product as any)?.name || item.variant?.name || "Unknown Product"}
-                                                </p>
-                                                <p className="text-sm text-gray-500">
-                                                    {item.variant.name} ({item.variant.sku})
-                                                </p>
-                                            </div>
-                                            <div className="text-right flex-shrink-0">
-                                                <p className="font-semibold text-gray-900">
-                                                    ৳{item.totalPrice}
-                                                </p>
-                                                <p className="text-sm text-gray-500">
-                                                    Qty: {item.quantity} × ৳{item.variant.price}
-                                                </p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Status History */}
-                            <div className="bg-white rounded-xl border border-gray-100 p-4">
-                                <h3 className="font-medium text-gray-900 mb-4 flex items-center gap-2">
-                                    <Clock className="w-4 h-4 text-gray-400" />
-                                    Timeline
-                                </h3>
-                                <div className="space-y-4">
-                                    {order.statusHistory.map((history, idx) => (
-                                        <div key={idx} className="flex gap-4">
-                                            <div className="flex flex-col items-center">
-                                                <div className="w-2.5 h-2.5 rounded-full bg-blue-500 mt-1.5"></div>
-                                                {idx !== order.statusHistory.length - 1 && (
-                                                    <div className="w-px h-full bg-gray-200 mt-1"></div>
-                                                )}
-                                            </div>
-                                            <div className="pb-4">
-                                                <p className="font-medium text-gray-900 uppercase text-sm">
-                                                    {history.status}
-                                                </p>
-                                                <p className="text-xs text-gray-500 mt-0.5">
-                                                    {formatDate(history.changedAt || new Date().toISOString())}
-                                                </p>
-                                                {history.note && (
-                                                    <p className="text-sm text-gray-600 mt-1 bg-gray-50 p-2 rounded-lg inline-block">
-                                                        {history.note}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Right Column: Details */}
-                        <div className="space-y-6">
-                            {/* Customer & Shipping */}
-                            <div className="bg-white rounded-xl border border-gray-100 p-4">
-                                <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                                    <MapPin className="w-4 h-4 text-gray-400" />
-                                    Shipping Details
-                                </h3>
-                                <div className="space-y-3 text-sm">
-                                    <div>
-                                        <p className="text-gray-500">Customer</p>
-                                        <p className="font-medium text-gray-900">
-                                            {order.shippingAddress.fullName}
-                                        </p>
-                                        <p className="text-gray-600">{order.shippingAddress.phone}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-gray-500">Address</p>
-                                        <p className="text-gray-900">
-                                            {order.shippingAddress.address}
-                                        </p>
-                                        <p className="text-gray-900">
-                                            {order.shippingAddress.city}, {order.shippingAddress.district}{" "}
-                                            {order.shippingAddress.postalCode}
-                                        </p>
-                                        <p className="text-gray-900">
-                                            {order.shippingAddress.country}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Payment Summary */}
-                            <div className="bg-white rounded-xl border border-gray-100 p-4">
-                                <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
-                                    <CreditCard className="w-4 h-4 text-gray-400" />
-                                    Payment Summary
-                                </h3>
-                                <div className="space-y-2 text-sm mb-4">
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">Method:</span>
-                                        <span className="font-medium text-gray-900 uppercase">
-                                            {order.paymentMethod}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <span className="text-gray-500">Status:</span>
-                                        <span
-                                            className={`px-2 py-0.5 rounded-full text-xs font-medium uppercase ${PAYMENT_STATUS_COLORS[order.paymentStatus || "pending"]
-                                                }`}
-                                        >
-                                            {order.paymentStatus}
-                                        </span>
-                                    </div>
-                                    {order.transactionId && (
-                                        <div className="flex justify-between">
-                                            <span className="text-gray-500">TrxID:</span>
-                                            <span className="font-mono text-gray-900 text-xs">
-                                                {order.transactionId}
-                                            </span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="border-t border-gray-100 pt-3 space-y-2 text-sm">
-                                    <div className="flex justify-between text-gray-600">
-                                        <span>Subtotal</span>
-                                        <span>৳{order.subtotal}</span>
-                                    </div>
-                                    <div className="flex justify-between text-gray-600">
-                                        <span>Shipping</span>
-                                        <span>৳{order.shippingCharge}</span>
-                                    </div>
-                                    {order.discount ? (
-                                        <div className="flex justify-between text-green-600">
-                                            <span>Discount</span>
-                                            <span>-৳{order.discount}</span>
-                                        </div>
-                                    ) : null}
-                                    <div className="flex justify-between font-bold text-gray-900 pt-2 border-t border-gray-50 text-base">
-                                        <span>Total</span>
-                                        <span>৳{order.totalAmount}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
+const ORDER_SEARCH_FIELDS: { value: OrderSearchField; label: string; placeholder: string }[] = [
+    { value: "orderNumber", label: "Order #", placeholder: "Search by order number, e.g. ORD-001..." },
+    { value: "customerName", label: "Customer", placeholder: "Search by customer name..." },
+    { value: "phone", label: "Phone", placeholder: "Search by phone number..." },
+];
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
 export default function AdminOrdersPage() {
     const [searchTerm, setSearchTerm] = useState("");
+    const [searchField, setSearchField] = useState<OrderSearchField>("orderNumber");
+    const [orderStatusFilter, setOrderStatusFilter] = useState<string>("all");
+    const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>("all");
+
     const { data, isLoading, isError } = useGetAllOrdersQuery({});
     const [updateStatus, { isLoading: isUpdating }] = useUpdateOrderStatusMutation();
     const [updatePaymentStatus, { isLoading: isUpdatingPayment }] = useUpdatePaymentStatusMutation();
@@ -281,12 +54,18 @@ export default function AdminOrdersPage() {
             : [];
 
     // Filter orders
-    const filteredOrders = orders.filter(
-        (order) =>
-            order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.shippingAddress.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            order.shippingAddress.phone.includes(searchTerm)
-    );
+    const filteredOrders = orders.filter((order) => {
+        const q = searchTerm.toLowerCase();
+        const matchesSearch = !q || (() => {
+            if (searchField === "orderNumber") return order.orderNumber.toLowerCase().includes(q);
+            if (searchField === "customerName") return order.shippingAddress.fullName.toLowerCase().includes(q);
+            if (searchField === "phone") return order.shippingAddress.phone.includes(searchTerm);
+            return true;
+        })();
+        const matchesOrderStatus = orderStatusFilter === "all" || order.orderStatus === orderStatusFilter;
+        const matchesPaymentStatus = paymentStatusFilter === "all" || (order.paymentStatus || "pending") === paymentStatusFilter;
+        return matchesSearch && matchesOrderStatus && matchesPaymentStatus;
+    });
 
     const handleStatusChange = async (orderId: string, currentStatus: string, newStatus: string) => {
         if (currentStatus === newStatus) return;
@@ -322,18 +101,82 @@ export default function AdminOrdersPage() {
                 </div>
             </div>
 
-            {/* Toolbar */}
-            <div className="flex flex-col sm:flex-row justify-between gap-4">
-                <div className="relative w-full sm:max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Search by order #, name or phone..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#B5451B]/20 focus:border-[#B5451B] transition-all shadow-sm"
-                    />
+            {/* Toolbar: Search + Filters */}
+            <div className="flex flex-wrap items-center gap-3">
+                {/* Search Field Selector + Input */}
+                <div className="flex items-center bg-white border border-gray-200 rounded-xl overflow-hidden focus-within:border-[#B5451B] transition-colors flex-1 min-w-[220px] max-w-sm shadow-sm">
+                    <select
+                        value={searchField}
+                        onChange={(e) => { setSearchField(e.target.value as OrderSearchField); setSearchTerm(""); }}
+                        className="text-xs font-semibold text-gray-500 bg-gray-50 border-r border-gray-200 px-3 py-2.5 outline-none cursor-pointer h-full hover:bg-gray-100 transition-colors"
+                    >
+                        {ORDER_SEARCH_FIELDS.map(f => (
+                            <option key={f.value} value={f.value}>{f.label}</option>
+                        ))}
+                    </select>
+                    <div className="flex items-center flex-1 px-3 gap-2">
+                        <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <input
+                            type="text"
+                            placeholder={ORDER_SEARCH_FIELDS.find(f => f.value === searchField)?.placeholder}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400 py-2.5"
+                        />
+                        {searchTerm && (
+                            <button onClick={() => setSearchTerm("")} className="text-gray-400 hover:text-gray-600">
+                                <X className="w-3.5 h-3.5" />
+                            </button>
+                        )}
+                    </div>
                 </div>
+
+                {/* Order Status Filter */}
+                <div className="relative">
+                    <select
+                        value={orderStatusFilter}
+                        onChange={(e) => setOrderStatusFilter(e.target.value)}
+                        className={`text-sm font-medium rounded-xl px-4 py-2.5 border outline-none cursor-pointer transition-colors appearance-none pr-8 shadow-sm ${orderStatusFilter !== "all" ? "border-[#B5451B] bg-orange-50 text-[#B5451B]" : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                            }`}
+                    >
+                        <option value="all">All Orders</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="processing">Processing</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                        <option value="returned">Returned</option>
+                    </select>
+                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                </div>
+
+                {/* Payment Status Filter */}
+                <div className="relative">
+                    <select
+                        value={paymentStatusFilter}
+                        onChange={(e) => setPaymentStatusFilter(e.target.value)}
+                        className={`text-sm font-medium rounded-xl px-4 py-2.5 border outline-none cursor-pointer transition-colors appearance-none pr-8 shadow-sm ${paymentStatusFilter !== "all" ? "border-[#B5451B] bg-orange-50 text-[#B5451B]" : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"
+                            }`}
+                    >
+                        <option value="all">All Payments</option>
+                        <option value="pending">Pending</option>
+                        <option value="paid">Paid</option>
+                        <option value="failed">Failed</option>
+                        <option value="refunded">Refunded</option>
+                    </select>
+                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                </div>
+
+                {/* Clear filters */}
+                {(searchTerm || orderStatusFilter !== "all" || paymentStatusFilter !== "all") && (
+                    <button
+                        onClick={() => { setSearchTerm(""); setOrderStatusFilter("all"); setPaymentStatusFilter("all"); }}
+                        className="text-xs font-semibold text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1"
+                    >
+                        <X className="w-3 h-3" /> Clear
+                    </button>
+                )}
             </div>
 
             {/* Table Section */}
@@ -400,7 +243,7 @@ export default function AdminOrdersPage() {
                                         {/* Order ID & Date */}
                                         <td className="px-5 py-4">
                                             <div className="flex flex-col">
-                                                <span className="font-semibold text-gray-900">
+                                                <span className="text-md text-gray-900">
                                                     {order.orderNumber}
                                                 </span>
                                                 <span className="text-xs text-gray-500 mt-0.5">

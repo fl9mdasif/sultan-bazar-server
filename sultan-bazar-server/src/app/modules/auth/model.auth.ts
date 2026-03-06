@@ -22,6 +22,10 @@ const userSchema = new Schema<TUser, UserModel>(
       type: String,
       required: false,
     },
+    profilePicture: {
+      type: String,
+      required: false,
+    },
     password: {
       type: String,
       required: true,
@@ -32,6 +36,8 @@ const userSchema = new Schema<TUser, UserModel>(
       enum: ['user', 'admin', 'superAdmin'],
       default: 'user',
     },
+
+    isBlocked: { type: Boolean, default: false },
 
     passwordChangedAt: { type: Date },
 

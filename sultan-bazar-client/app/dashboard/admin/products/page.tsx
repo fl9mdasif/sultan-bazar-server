@@ -12,7 +12,7 @@ import { useGetAllCategoriesQuery } from "@/redux/api/categoryApi";
 import type { TVariant, TProduct, TCategory } from "@/types/common";
 import {
     Plus, Search, Pencil, Trash2, Star, Package,
-    X, Loader2, ChevronLeft, ChevronRight, AlertTriangle,
+    X, Loader2, ChevronLeft, ChevronRight, AlertTriangle, ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -34,220 +34,23 @@ const statusColors: Record<string, string> = {
     archived: "bg-gray-100 text-gray-500",
 };
 
-// ─── Modal ────────────────────────────────────────────────────────────────────
-function ProductModal({
-    open, onClose, initial, onSave, saving, categoriesList
-}: {
-    open: boolean;
-    onClose: () => void;
-    initial: ReturnType<typeof emptyForm> | null;
-    onSave: (data: ReturnType<typeof emptyForm>) => void;
-    saving: boolean;
-    categoriesList: TCategory[];
-}) {
-    const [form, setForm] = useState<ReturnType<typeof emptyForm>>(initial ?? emptyForm());
+import { ProductModal, DeleteDialog } from "./product.modal";
 
-    // Update form when initial changes (e.g., when Edit button is clicked)
-    useEffect(() => {
-        if (open) {
-            setForm(initial ?? emptyForm());
-        }
-    }, [open, initial]);
-
-    if (!open) return null;
-
-    const setField = (k: string, v: unknown) => setForm((f) => ({ ...f, [k]: v }));
-    const setVariant = (i: number, k: string, v: unknown) =>
-        setForm((f) => {
-            const vs = [...f.variants];
-            vs[i] = { ...vs[i], [k]: v };
-            return { ...f, variants: vs };
-        });
-    const addVariant = () => setForm((f) => ({ ...f, variants: [...f.variants, emptyVariant()] }));
-    const removeVariant = (i: number) =>
-        setForm((f) => ({ ...f, variants: f.variants.filter((_, idx) => idx !== i) }));
-
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-                {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b">
-                    <h2 className="text-lg font-bold text-gray-900">
-                        {initial?.name ? "Edit Product" : "Create Product"}
-                    </h2>
-                    <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
-                        <X className="w-4 h-4" />
-                    </button>
-                </div>
-
-                {/* Body */}
-                <div className="overflow-y-auto flex-1 px-6 py-5 space-y-5">
-                    {/* Basic info */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label className="label">Product Name *</label>
-                            <input className="input-field" value={form.name}
-                                onChange={(e) => {
-                                    setField("name", e.target.value);
-                                    if (!initial?.slug) {
-                                        setField("slug", e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
-                                    }
-                                }} placeholder="e.g. Mustard Oil" />
-                        </div>
-                        <div>
-                            <label className="label">Category *</label>
-                            <select className="input-field" value={form.category}
-                                onChange={(e) => setField("category", e.target.value)}>
-                                <option value="" disabled>Select a category</option>
-                                {categoriesList.map(c => (
-                                    <option key={c._id} value={c._id}>{c.name}</option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="label">Slug * (used in URL)</label>
-                        <input className="input-field" value={form.slug}
-                            onChange={(e) => setField("slug", e.target.value)} placeholder="e.g. mustard-oil" />
-                    </div>
-
-                    <div>
-                        <label className="label">Description *</label>
-                        <textarea className="input-field min-h-[80px] resize-none" value={form.description}
-                            onChange={(e) => setField("description", e.target.value)}
-                            placeholder="Product description..." />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                            <label className="label">Thumbnail URL *</label>
-                            <input className="input-field" value={form.thumbnail}
-                                onChange={(e) => setField("thumbnail", e.target.value)} placeholder="https://..." />
-                        </div>
-                        <div>
-                            <label className="label">Tags (comma separated)</label>
-                            <input className="input-field" value={form.tags}
-                                onChange={(e) => setField("tags", e.target.value)} placeholder="spice, oil, raw" />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="label">Status</label>
-                        <select className="input-field" value={form.status}
-                            onChange={(e) => setField("status", e.target.value)}>
-                            <option value="active">Active</option>
-                            <option value="draft">Draft</option>
-                            <option value="archived">Archived</option>
-                        </select>
-                    </div>
-
-                    {/* Variants */}
-                    <div>
-                        <div className="flex items-center justify-between mb-3">
-                            <label className="label mb-0">Variants *</label>
-                            <button type="button" onClick={addVariant}
-                                className="text-xs font-semibold flex items-center gap-1 hover:underline" style={{ color: "#B5451B" }}>
-                                <Plus className="w-3.5 h-3.5" /> Add Variant
-                            </button>
-                        </div>
-                        <div className="space-y-4">
-                            {form.variants.map((v, i) => (
-                                <div key={i} className="border border-gray-200 rounded-xl p-4 relative">
-                                    {form.variants.length > 1 && (
-                                        <button onClick={() => removeVariant(i)}
-                                            className="absolute top-2 right-2 p-1 text-gray-400 hover:text-red-500">
-                                            <X className="w-3.5 h-3.5" />
-                                        </button>
-                                    )}
-                                    <p className="text-xs font-semibold text-gray-500 mb-3">Variant {i + 1}</p>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div>
-                                            <label className="label">Name *</label>
-                                            <input className="input-field" value={v.name}
-                                                onChange={(e) => setVariant(i, "name", e.target.value)} placeholder="500ml" />
-                                        </div>
-                                        <div>
-                                            <label className="label">SKU *</label>
-                                            <input className="input-field" value={v.sku}
-                                                onChange={(e) => setVariant(i, "sku", e.target.value)} placeholder="OIL-500ML" />
-                                        </div>
-                                        <div>
-                                            <label className="label">Price (৳) *</label>
-                                            <input type="number" className="input-field" value={v.price}
-                                                onChange={(e) => setVariant(i, "price", Number(e.target.value))} />
-                                        </div>
-                                        <div>
-                                            <label className="label">Discount Price (৳)</label>
-                                            <input type="number" className="input-field" value={v.discountPrice ?? ""}
-                                                onChange={(e) => setVariant(i, "discountPrice", e.target.value ? Number(e.target.value) : undefined)} />
-                                        </div>
-                                        <div>
-                                            <label className="label">Stock *</label>
-                                            <input type="number" className="input-field" value={v.stock}
-                                                onChange={(e) => setVariant(i, "stock", Number(e.target.value))} />
-                                        </div>
-                                        <div>
-                                            <label className="label">Weight (g)</label>
-                                            <input type="number" className="input-field" value={v.weight ?? ""}
-                                                onChange={(e) => setVariant(i, "weight", e.target.value ? Number(e.target.value) : undefined)} />
-                                        </div>
-                                    </div>
-                                    <label className="flex items-center gap-2 mt-3 cursor-pointer">
-                                        <input type="checkbox" checked={v.isAvailable !== false}
-                                            onChange={(e) => setVariant(i, "isAvailable", e.target.checked)}
-                                            className="accent-[#B5451B]" />
-                                        <span className="text-sm text-gray-600">Available for purchase</span>
-                                    </label>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Footer */}
-                <div className="flex items-center justify-end gap-3 px-6 py-4 border-t">
-                    <Button variant="outline" onClick={onClose} className="rounded-xl">Cancel</Button>
-                    <Button disabled={saving} onClick={() => onSave(form)}
-                        className="rounded-xl text-white"
-                        style={{ background: "linear-gradient(135deg, #B5451B, #D4860A)" }}>
-                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Product"}
-                    </Button>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// ─── Delete Confirm ───────────────────────────────────────────────────────────
-function DeleteDialog({ name, onConfirm, onCancel, loading }: {
-    name: string; onConfirm: () => void; onCancel: () => void; loading: boolean;
-}) {
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
-                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-                    <AlertTriangle className="w-5 h-5 text-red-500" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">Delete Product?</h3>
-                <p className="text-sm text-gray-500 mb-5">
-                    Are you sure you want to delete <strong>{name}</strong>? This cannot be undone.
-                </p>
-                <div className="flex gap-3">
-                    <Button variant="outline" onClick={onCancel} className="flex-1 rounded-xl">Cancel</Button>
-                    <Button onClick={onConfirm} disabled={loading}
-                        className="flex-1 rounded-xl bg-red-600 hover:bg-red-700 text-white">
-                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Delete"}
-                    </Button>
-                </div>
-            </div>
-        </div>
-    );
-}
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
+type SearchField = "name" | "slug" | "tag";
+
+const SEARCH_FIELDS: { value: SearchField; label: string; placeholder: string }[] = [
+    { value: "name", label: "Name", placeholder: "Search by product name..." },
+    { value: "slug", label: "Slug", placeholder: "Search by slug, e.g. mustard-oil..." },
+    { value: "tag", label: "Tag", placeholder: "Search by tag, e.g. spice..." },
+];
+
 export default function AdminProductsPage() {
     const [search, setSearch] = useState("");
+    const [searchField, setSearchField] = useState<SearchField>("name");
+    const [statusFilter, setStatusFilter] = useState<string>("all");
+    const [categoryFilter, setCategoryFilter] = useState<string>("all");
     const [page, setPage] = useState(1);
     const limit = 10;
 
@@ -267,8 +70,30 @@ export default function AdminProductsPage() {
     const [editTarget, setEditTarget] = useState<TProduct | null>(null);
     const [deleteTarget, setDeleteTarget] = useState<TProduct | null>(null);
 
-    const products: TProduct[] = data?.data?.products ?? data?.data ?? [];
+    const allProducts: TProduct[] = data?.data?.products ?? data?.data ?? [];
     const totalPages: number = data?.data?.totalPages ?? 1;
+
+    // ── Client-side filtering ──────────────────────────────────────────
+    const products = allProducts.filter((p) => {
+        const q = search.toLowerCase();
+
+        // Search field filter
+        const matchesSearch = !q || (() => {
+            if (searchField === "name") return p.name.toLowerCase().includes(q);
+            if (searchField === "slug") return p.slug.toLowerCase().includes(q);
+            if (searchField === "tag") return (p.tags ?? []).some(t => t.toLowerCase().includes(q));
+            return true;
+        })();
+
+        // Status filter
+        const matchesStatus = statusFilter === "all" || (p.status ?? "active") === statusFilter;
+
+        // Category filter
+        const catId = typeof p.category === "object" ? (p.category as any)?._id : p.category;
+        const matchesCategory = categoryFilter === "all" || catId === categoryFilter;
+
+        return matchesSearch && matchesStatus && matchesCategory;
+    });
 
     // ── Helpers ──────────────────────────────────────────────────────
     const productToForm = (p: TProduct): ReturnType<typeof emptyForm> => ({
@@ -383,21 +208,76 @@ export default function AdminProductsPage() {
                 </Button>
             </div>
 
-            {/* Search */}
-            <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-2.5 mb-6 focus-within:border-[#B5451B] transition-colors max-w-sm">
-                <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                <input
-                    className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400"
-                    placeholder="Search products..."
-                    value={search}
-                    onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                />
-                {search && (
-                    <button onClick={() => setSearch("")} className="text-gray-400 hover:text-gray-600">
-                        <X className="w-3.5 h-3.5" />
+            {/* Toolbar: Search + Filters */}
+            <div className="flex flex-wrap items-center gap-3 mb-6">
+                {/* Search Field Selector + Input */}
+                <div className="flex items-center bg-white border border-gray-200 rounded-xl overflow-hidden focus-within:border-[#B5451B] transition-colors flex-1 min-w-[220px] max-w-sm">
+                    <select
+                        value={searchField}
+                        onChange={(e) => { setSearchField(e.target.value as SearchField); setSearch(""); setPage(1); }}
+                        className="text-xs font-semibold text-gray-500 bg-gray-50 border-r border-gray-200 px-3 py-2.5 outline-none cursor-pointer h-full hover:bg-gray-100 transition-colors"
+                    >
+                        {SEARCH_FIELDS.map(f => (
+                            <option key={f.value} value={f.value}>{f.label}</option>
+                        ))}
+                    </select>
+                    <div className="flex items-center flex-1 px-3 gap-2">
+                        <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <input
+                            className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400 py-2.5"
+                            placeholder={SEARCH_FIELDS.find(f => f.value === searchField)?.placeholder}
+                            value={search}
+                            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                        />
+                        {search && (
+                            <button onClick={() => setSearch("")} className="text-gray-400 hover:text-gray-600">
+                                <X className="w-3.5 h-3.5" />
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                {/* Status Filter */}
+                <div className="relative">
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+                        className={`text-sm font-medium rounded-xl px-4 py-2.5 border outline-none cursor-pointer transition-colors appearance-none pr-8 ${statusFilter !== "all" ? "border-[#B5451B] bg-orange-50 text-[#B5451B]" : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"}`}
+                    >
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="draft">Draft</option>
+                        <option value="archived">Archived</option>
+                    </select>
+                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                </div>
+
+                {/* Category Filter */}
+                <div className="relative">
+                    <select
+                        value={categoryFilter}
+                        onChange={(e) => { setCategoryFilter(e.target.value); setPage(1); }}
+                        className={`text-sm font-medium rounded-xl px-4 py-2.5 border outline-none cursor-pointer transition-colors appearance-none pr-8 ${categoryFilter !== "all" ? "border-[#B5451B] bg-orange-50 text-[#B5451B]" : "border-gray-200 bg-white text-gray-600 hover:border-gray-300"}`}
+                    >
+                        <option value="all">All Categories</option>
+                        {categoriesList.map(c => (
+                            <option key={c._id} value={c._id}>{c.name}</option>
+                        ))}
+                    </select>
+                    <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" />
+                </div>
+
+                {/* Clear filters */}
+                {(search || statusFilter !== "all" || categoryFilter !== "all") && (
+                    <button
+                        onClick={() => { setSearch(""); setStatusFilter("all"); setCategoryFilter("all"); setPage(1); }}
+                        className="text-xs font-semibold text-gray-400 hover:text-red-500 transition-colors flex items-center gap-1"
+                    >
+                        <X className="w-3 h-3" /> Clear
                     </button>
                 )}
             </div>
+
 
             {/* Table */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">

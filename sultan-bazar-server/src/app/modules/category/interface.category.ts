@@ -4,6 +4,7 @@ export interface TCategory {
   name: string;
   slug: string;
   description?: string;
+  thumbnail: string;
   isActive: boolean;
   order: number;
 }

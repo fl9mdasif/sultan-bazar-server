@@ -157,10 +157,10 @@ export default function DashboardSidebar() {
             {/* Mobile: top bar + slide-in drawer */}
             <div className="lg:hidden">
                 <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100 sticky top-0 z-30">
-                    <Link href="/" className="flex items-center gap-2">
+                    {/* <Link href="/" className="flex items-center gap-2">
                         <span className="text-xl">🪔</span>
                         <span className="font-extrabold text-sm" style={{ color: "#B5451B" }}>Sultan Bazar</span>
-                    </Link>
+                    </Link> */}
                     <button onClick={() => setMobileOpen(true)} className="p-2 text-gray-600 hover:text-[#B5451B]">
                         <Menu className="w-5 h-5" />
                     </button>

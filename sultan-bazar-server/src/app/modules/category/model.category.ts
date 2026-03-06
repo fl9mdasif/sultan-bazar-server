@@ -6,8 +6,8 @@ const categorySchema = new Schema(
     slug: { type: String, required: true, unique: true },      // "cooking-oil"
     description: { type: String },
     isActive: { type: Boolean, default: true },
+    thumbnail: { type: String },                                   // category banner/icon
     // order: { type: Number, default: 0 },  // for manual sorting in UI
-    // image: { type: String },                                   // category banner/icon
     // Self-referencing for nested categories
     // parent: { type: Schema.Types.ObjectId, ref: 'Category', default: null },
     // null = top-level category

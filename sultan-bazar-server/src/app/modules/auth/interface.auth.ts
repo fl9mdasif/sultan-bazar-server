@@ -28,7 +28,9 @@ export interface TUser {
   contactNumber: string;
   address?: string;
   password: string;
+  profilePicture?: string;
   role: 'user' | 'admin' | 'superAdmin';
+  isBlocked?: boolean;
   passwordChangedAt?: Date;
   savedAddresses?: TSavedAddress[];
 }

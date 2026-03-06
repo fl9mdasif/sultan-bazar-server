@@ -156,6 +156,93 @@ const setDefaultAddress = async (userId: string, addressId: string) => {
     return result.savedAddresses;
 };
 
+// ── SUPERADMIN: Get all users (with search & pagination) ──────────────────────
+const getAllUsers = async (query: {
+    search?: string;
+    role?: string;
+    page?: number;
+    limit?: number;
+}) => {
+    const { search, role, page = 1, limit = 20 } = query;
+    const filter: Record<string, unknown> = {};
+
+    if (search) {
+        filter.$or = [
+            { username: { $regex: search, $options: 'i' } },
+            { email: { $regex: search, $options: 'i' } },
+            { contactNumber: { $regex: search, $options: 'i' } },
+        ];
+    }
+    if (role) filter.role = role;
+
+    const total = await User.countDocuments(filter);
+    const users = await User.find(filter)
+        .select('-password -savedAddresses')
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean();
+
+    return {
+        users,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+    };
+};
+
+// ── SUPERADMIN: Update a user's role ─────────────────────────────────────────
+const updateUserRole = async (
+    targetId: string,
+    callerId: string,
+    newRole: 'user' | 'admin' | 'superAdmin',
+) => {
+    if (targetId === callerId) {
+        throw new AppError(httpStatus.FORBIDDEN, 'Cannot change your own role', 'Self-operation not allowed');
+    }
+
+    const user = await User.findByIdAndUpdate(
+        targetId,
+        { role: newRole },
+        { new: true, select: '-password -savedAddresses' },
+    );
+
+    if (!user) throw new AppError(httpStatus.NOT_FOUND, 'User not found', 'User not found');
+    return user;
+};
+
+// ── SUPERADMIN: Toggle block/unblock a user ───────────────────────────────────
+const toggleBlockUser = async (targetId: string, callerId: string) => {
+    if (targetId === callerId) {
+        throw new AppError(httpStatus.FORBIDDEN, 'Cannot block yourself', 'Self-operation not allowed');
+    }
+
+    const user = await User.findById(targetId).select('isBlocked');
+    if (!user) throw new AppError(httpStatus.NOT_FOUND, 'User not found', 'User not found');
+
+    const updated = await User.findByIdAndUpdate(
+        targetId,
+        { isBlocked: !user.isBlocked },
+        { new: true, select: '-password -savedAddresses' },
+    );
+
+    return updated;
+};
+
+// ── SUPERADMIN: Delete a user ─────────────────────────────────────────────────
+const deleteUser = async (targetId: string, callerId: string) => {
+    if (targetId === callerId) {
+        throw new AppError(httpStatus.FORBIDDEN, 'Cannot delete yourself', 'Self-operation not allowed');
+    }
+
+    const user = await User.findByIdAndDelete(targetId);
+    if (!user) throw new AppError(httpStatus.NOT_FOUND, 'User not found', 'User not found');
+    return { deleted: true, userId: targetId };
+};
+
+
+
 export const userServices = {
     getAddresses,
     addAddress,
@@ -163,4 +250,11 @@ export const userServices = {
     deleteAddress,
     setDefaultAddress,
     autoSaveAddressFromOrder,   // exported so order service can call it
+
+    // ── Superadmin ────────────────────────────────────────────────────
+    getAllUsers,
+    updateUserRole,
+    toggleBlockUser,
+    deleteUser,
 };
+

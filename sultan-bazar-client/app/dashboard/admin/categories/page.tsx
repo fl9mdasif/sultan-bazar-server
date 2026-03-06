@@ -20,127 +20,13 @@ const emptyForm = () => ({
     name: "",
     slug: "",
     description: "",
+    thumbnail: "",
     isActive: true,
     order: 0,
 });
 
-// ─── Modal ────────────────────────────────────────────────────────────────────
-function CategoryModal({
-    open, onClose, initial, onSave, saving,
-}: {
-    open: boolean;
-    onClose: () => void;
-    initial: ReturnType<typeof emptyForm> | null;
-    onSave: (data: ReturnType<typeof emptyForm>) => void;
-    saving: boolean;
-}) {
-    const [form, setForm] = useState<ReturnType<typeof emptyForm>>(initial ?? emptyForm());
+import { CategoryModal, DeleteDialog } from "./category.modal";
 
-    useEffect(() => {
-        if (open) {
-            setForm(initial ?? emptyForm());
-        }
-    }, [open, initial]);
-
-    if (!open) return null;
-
-    const setField = (k: keyof typeof form, v: string | boolean | number) => setForm((f) => ({ ...f, [k]: v }));
-
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] flex flex-col">
-                {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b">
-                    <h2 className="text-lg font-bold text-gray-900">
-                        {initial?.name ? "Edit Category" : "Create Category"}
-                    </h2>
-                    <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500">
-                        <X className="w-4 h-4" />
-                    </button>
-                </div>
-
-                {/* Body */}
-                <div className="overflow-y-auto flex-1 px-6 py-5 space-y-4">
-                    <div>
-                        <label className="label">Category Name *</label>
-                        <input className="input-field" value={form.name}
-                            onChange={(e) => {
-                                setField("name", e.target.value);
-                                if (!initial?.slug) {
-                                    setField("slug", e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
-                                }
-                            }} placeholder="e.g. Spices" />
-                    </div>
-
-                    <div>
-                        <label className="label">Slug * (used in URL)</label>
-                        <input className="input-field" value={form.slug}
-                            onChange={(e) => setField("slug", e.target.value)} placeholder="e.g. spices" />
-                    </div>
-
-                    <div>
-                        <label className="label">Description</label>
-                        <textarea className="input-field min-h-[80px] resize-none" value={form.description}
-                            onChange={(e) => setField("description", e.target.value)}
-                            placeholder="Brief description of the category..." />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="label">Display Order</label>
-                            <input type="number" className="input-field" value={form.order}
-                                onChange={(e) => setField("order", Number(e.target.value))} />
-                        </div>
-                        <div className="flex flex-col justify-end pb-3">
-                            <label className="flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" checked={form.isActive}
-                                    onChange={(e) => setField("isActive", e.target.checked)}
-                                    className="accent-[#B5451B]" />
-                                <span className="text-sm font-medium text-gray-700">Active</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Footer */}
-                <div className="flex items-center justify-end gap-3 px-6 py-4 border-t">
-                    <Button variant="outline" onClick={onClose} className="rounded-xl">Cancel</Button>
-                    <Button disabled={saving} onClick={() => onSave(form)}
-                        className="rounded-xl text-white"
-                        style={{ background: "linear-gradient(135deg, #B5451B, #D4860A)" }}>
-                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Category"}
-                    </Button>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// ─── Delete Confirm ───────────────────────────────────────────────────────────
-function DeleteDialog({ name, onConfirm, onCancel, loading }: {
-    name: string; onConfirm: () => void; onCancel: () => void; loading: boolean;
-}) {
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
-                <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-                    <AlertTriangle className="w-5 h-5 text-red-500" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1">Delete Category?</h3>
-                <p className="text-sm text-gray-500 mb-5">
-                    Are you sure you want to delete <strong>{name}</strong>? This cannot be undone.
-                </p>
-                <div className="flex gap-3">
-                    <Button variant="outline" onClick={onCancel} className="flex-1 rounded-xl">Cancel</Button>
-                    <Button onClick={onConfirm} disabled={loading}
-                        className="flex-1 rounded-xl bg-red-600 hover:bg-red-700 text-white">
-                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Delete"}
-                    </Button>
-                </div>
-            </div>
-        </div>
-    );
-}
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 export default function AdminCategoriesPage() {
@@ -172,6 +58,7 @@ export default function AdminCategoriesPage() {
         name: c.name,
         slug: c.slug,
         description: c.description || "",
+        thumbnail: (c as any).thumbnail || "",
         isActive: c.isActive,
         order: c.order,
     });
@@ -187,6 +74,7 @@ export default function AdminCategoriesPage() {
                 if (form.name !== editTarget.name) changes.name = form.name;
                 if (form.slug !== editTarget.slug) changes.slug = form.slug;
                 if (form.description !== editTarget.description) changes.description = form.description;
+                if (form.thumbnail !== ((editTarget as any).thumbnail || "")) changes.thumbnail = form.thumbnail;
                 if (form.isActive !== editTarget.isActive) changes.isActive = form.isActive;
                 if (form.order !== editTarget.order) changes.order = form.order;
 
