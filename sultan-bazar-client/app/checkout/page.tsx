@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import {
     useGetAddressesQuery,
     useAddAddressMutation,
@@ -76,7 +76,7 @@ function AddressCard({
 }
 
 // ── Main Page ────────────────────────────────────────────────────────────────
-export default function CheckoutPage() {
+function CheckoutPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const productIdParam = searchParams.get("productId");
@@ -496,5 +496,17 @@ export default function CheckoutPage() {
         </div>
 
 
+    );
+}
+
+export default function CheckoutPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-[#FAFAF8]">
+                <Loader2 className="w-10 h-10 animate-spin text-[#B5451B]" />
+            </div>
+        }>
+            <CheckoutPageContent />
+        </Suspense>
     );
 }
