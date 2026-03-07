@@ -89,7 +89,7 @@ function ProductCard({ p }: { p: TProduct }) {
 
                     {/* Wishlist */}
                     <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setWished(!wished); }}
-                        className="absolute top-2 right-2 z-10 w-7 h-7 bg-white rounded-full shadow flex items-center justify-center hover:scale-110 transition-transform">
+                        className="absolute top-2 right-2 z-10 w-7 h-7 bg-white rounded-full shadow flex items-center justify-center hover:scale-110 transition-transform cursor-pointer">
                         <Heart className="w-3.5 h-3.5" fill={wished ? "#B5451B" : "none"} stroke={wished ? "#B5451B" : "#9ca3af"} />
                     </button>
                     {p.isFeatured && (
@@ -177,7 +177,7 @@ function FilterPanel({
                 <h3 className="font-bold text-gray-800 text-base flex items-center gap-2">
                     <Filter className="w-4 h-4" style={{ color: "#B5451B" }} /> Filters
                 </h3>
-                <button onClick={clearAll} className="text-xs text-gray-400 hover:text-[#B5451B] transition-colors">
+                <button onClick={clearAll} className="text-xs text-gray-400 hover:text-[#B5451B] transition-colors cursor-pointer">
                     Clear all
                 </button>
             </div>
@@ -196,7 +196,7 @@ function FilterPanel({
                         className="bg-transparent text-sm outline-none w-full placeholder:text-gray-400"
                     />
                     {search && (
-                        <button onClick={() => setSearch("")}>
+                        <button onClick={() => setSearch("")} className="cursor-pointer">
                             <X className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600" />
                         </button>
                     )}
@@ -381,7 +381,7 @@ export default function ProductsPage() {
                             {/* Mobile filter trigger */}
                             <Sheet>
                                 <SheetTrigger asChild>
-                                    <Button variant="outline" size="sm" className="lg:hidden flex items-center gap-2 rounded-full font-medium"
+                                    <Button variant="outline" size="sm" className="lg:hidden flex items-center gap-2 rounded-full font-medium cursor-pointer"
                                         style={{ borderColor: "#B5451B", color: "#B5451B" }}>
                                         <SlidersHorizontal className="w-4 h-4" />
                                         Filters
@@ -397,7 +397,7 @@ export default function ProductsPage() {
                                     <div className="mb-4 flex items-center justify-between">
                                         <span className="font-bold text-gray-800">Filters</span>
                                         <SheetClose asChild>
-                                            <button className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+                                            <button className="text-gray-400 hover:text-gray-600 cursor-pointer"><X className="w-5 h-5" /></button>
                                         </SheetClose>
                                     </div>
                                     <FilterPanel
@@ -458,7 +458,7 @@ export default function ProductsPage() {
                                 <span className="text-5xl mb-4">🧐</span>
                                 <p className="font-bold text-gray-700 text-lg mb-1">No products found</p>
                                 <p className="text-gray-400 text-sm mb-5">Try adjusting your search or filters</p>
-                                <Button variant="outline" size="sm" className="rounded-full"
+                                <Button variant="outline" size="sm" className="rounded-full cursor-pointer"
                                     style={{ borderColor: "#B5451B", color: "#B5451B" }}
                                     onClick={() => { setSearch(""); setSelectedCategory("All"); setPriceRange([0, 1000]); setInStockOnly(false); }}>
                                     Clear Filters

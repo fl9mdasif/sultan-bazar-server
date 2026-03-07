@@ -17,7 +17,8 @@ const TABS = [
 ];
 
 export default function UserOrdersPage() {
-    const { data: myOrdersData, isLoading } = useGetMyOrdersQuery({});
+    const { data: myOrdersData, isLoading, refetch } = useGetMyOrdersQuery({});
+
     const orders: TOrder[] = Array.isArray(myOrdersData)
         ? myOrdersData
         : Array.isArray(myOrdersData?.data)
@@ -35,6 +36,8 @@ export default function UserOrdersPage() {
     const openReviewModal = (productId: string, productName: string) => {
         setReviewProduct({ id: productId, name: productName });
         setIsReviewOpen(true);
+        refetch()
+
     };
 
     // Filter orders based on active tab

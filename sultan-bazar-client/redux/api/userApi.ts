@@ -1,3 +1,4 @@
+import { TSavedAddress } from "@/types";
 import { tagTypes } from "../tag-types";
 import { baseApi } from "./baseApi";
 
@@ -24,6 +25,52 @@ const userApi = baseApi.injectEndpoints({
                 method: "POST",
                 data,
             }),
+        }),
+
+        // ── Address management ─────────────────────────────────────────────────
+
+        // GET /users/addresses
+        getAddresses: build.query({
+            query: () => ({ url: "/users/addresses", method: "GET" }),
+            providesTags: [tagTypes.users],
+        }),
+
+        // POST /users/addresses
+        addAddress: build.mutation({
+            query: (data: TSavedAddress) => ({
+                url: "/users/addresses",
+                method: "POST",
+                data,
+            }),
+            invalidatesTags: [tagTypes.users],
+        }),
+
+        // PATCH /users/addresses/:id
+        updateAddress: build.mutation({
+            query: ({ id, data }: { id: string; data: Partial<TSavedAddress> }) => ({
+                url: `/users/addresses/${id}`,
+                method: "PATCH",
+                data,
+            }),
+            invalidatesTags: [tagTypes.users],
+        }),
+
+        // PATCH /users/addresses/:id/default
+        setDefaultAddress: build.mutation({
+            query: (id: string) => ({
+                url: `/users/addresses/${id}/default`,
+                method: "PATCH",
+            }),
+            invalidatesTags: [tagTypes.users],
+        }),
+
+        // DELETE /users/addresses/:id
+        deleteAddress: build.mutation({
+            query: (id: string) => ({
+                url: `/users/addresses/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: [tagTypes.users],
         }),
 
         // ── Admin / Superadmin user management ────────────────────────────────
@@ -72,4 +119,9 @@ export const {
     useUpdateUserRoleMutation,
     useToggleBlockUserMutation,
     useDeleteUserMutation,
+    useGetAddressesQuery,
+    useAddAddressMutation,
+    useUpdateAddressMutation,
+    useSetDefaultAddressMutation,
+    useDeleteAddressMutation,
 } = userApi;

@@ -47,7 +47,7 @@ instance.interceptors.response.use(
       errorMessages: error?.response?.data?.message,
     };
     // return Promise.reject(error);
-    return responseObject;
+    return Promise.reject(responseObject);
   }
 );
 

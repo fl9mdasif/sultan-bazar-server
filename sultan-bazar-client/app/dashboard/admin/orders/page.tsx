@@ -40,7 +40,7 @@ export default function AdminOrdersPage() {
     const [orderStatusFilter, setOrderStatusFilter] = useState<string>("all");
     const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>("all");
 
-    const { data, isLoading, isError } = useGetAllOrdersQuery({});
+    const { data, refetch, isLoading, isError } = useGetAllOrdersQuery({});
     const [updateStatus, { isLoading: isUpdating }] = useUpdateOrderStatusMutation();
     const [updatePaymentStatus, { isLoading: isUpdatingPayment }] = useUpdatePaymentStatusMutation();
 
@@ -72,6 +72,8 @@ export default function AdminOrdersPage() {
         try {
             await updateStatus({ id: orderId, data: { status: newStatus } }).unwrap();
             toast.success("Order status updated");
+            refetch()
+
         } catch (err: any) {
             toast.error(err.data?.message || "Failed to update status");
         }

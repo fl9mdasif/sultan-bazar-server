@@ -96,7 +96,7 @@ export default function AdminUsersPage() {
     }, []);
     const isSuperAdmin = viewerRole === "superadmin" || viewerRole === "superAdmin";
 
-    const { data, isLoading, isFetching } = useGetAllUsersQuery(
+    const { data, isLoading, isFetching, refetch } = useGetAllUsersQuery(
         { search: search || undefined, role: roleFilter !== "all" ? roleFilter : undefined, page, limit },
         { refetchOnMountOrArgChange: true }
     );
@@ -119,6 +119,7 @@ export default function AdminUsersPage() {
         try {
             await updateRole({ id: user._id, role: newRole }).unwrap();
             toast.success(`Role updated to ${newRole}`);
+            refetch()
         } catch {
             toast.error("Failed to update role.");
         } finally {
@@ -130,6 +131,7 @@ export default function AdminUsersPage() {
         try {
             await toggleBlock(user._id).unwrap();
             toast.success(user.isBlocked ? "User unblocked." : "User blocked.");
+            refetch()
         } catch {
             toast.error("Failed to update block status.");
         }
@@ -140,6 +142,7 @@ export default function AdminUsersPage() {
         try {
             await deleteUser(deleteTarget._id).unwrap();
             toast.success("User deleted.");
+            refetch()
             setDeleteTarget(null);
         } catch {
             toast.error("Failed to delete user.");

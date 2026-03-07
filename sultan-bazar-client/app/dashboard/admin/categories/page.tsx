@@ -32,7 +32,7 @@ import { CategoryModal, DeleteDialog } from "./category.modal";
 export default function AdminCategoriesPage() {
     const [search, setSearch] = useState("");
 
-    const { data, isLoading, isFetching } = useGetAllCategoriesQuery(undefined, { refetchOnMountOrArgChange: true });
+    const { data, refetch, isLoading, isFetching } = useGetAllCategoriesQuery(undefined, { refetchOnMountOrArgChange: true });
 
     const [createCategory, { isLoading: creating }] = useCreateCategoryMutation();
     const [updateCategory, { isLoading: updating }] = useUpdateCategoryMutation();
@@ -45,7 +45,7 @@ export default function AdminCategoriesPage() {
 
     const categories: TCategory[] = (Array.isArray(data) ? data : data?.data) || [];
 
-    console.log('categories', data);
+    // console.log('categories', data);
     // Client-side search (since category API might not support ?search= yet)
     const filteredCategories = categories.filter(c =>
         c.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -86,6 +86,8 @@ export default function AdminCategoriesPage() {
 
                 await updateCategory({ id: editTarget._id, data: changes }).unwrap();
                 toast.success("Category updated!");
+                refetch()
+
             } else {
                 await createCategory(form).unwrap();
                 toast.success("Category created!");
@@ -101,6 +103,7 @@ export default function AdminCategoriesPage() {
         try {
             await deleteCategory(deleteTarget._id).unwrap();
             toast.success("Category deleted.");
+            refetch();
             setDeleteTarget(null);
         } catch (error: any) {
             toast.error(error?.data?.message || "Failed to delete category.");
@@ -111,6 +114,7 @@ export default function AdminCategoriesPage() {
         try {
             await toggleStatus(c._id).unwrap();
             toast.success(`Category is now ${c.isActive ? 'hidden' : 'visible'}.`);
+            refetch()
         } catch {
             toast.error("Failed to update status.");
         }

@@ -54,7 +54,7 @@ export default function AdminProductsPage() {
     const [page, setPage] = useState(1);
     const limit = 10;
 
-    const { data, isLoading, isFetching } = useGetAllProductsQuery(
+    const { data, refetch, isLoading, isFetching } = useGetAllProductsQuery(
         { search: search || undefined, page, limit },
         { refetchOnMountOrArgChange: true }
     );
@@ -158,9 +158,13 @@ export default function AdminProductsPage() {
                 }
                 await updateProduct({ id: editTarget._id, data: changes }).unwrap();
                 toast.success("Product updated!");
+                refetch()
+
             } else {
                 await createProduct(payload).unwrap();
                 toast.success("Product created!");
+                refetch()
+
             }
             setModalOpen(false);
         } catch {
@@ -173,6 +177,8 @@ export default function AdminProductsPage() {
         try {
             await deleteProduct(deleteTarget._id).unwrap();
             toast.success("Product deleted.");
+            refetch()
+
             setDeleteTarget(null);
         } catch {
             toast.error("Failed to delete product.");

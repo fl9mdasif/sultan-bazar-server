@@ -2,6 +2,7 @@ import httpStatus from 'http-status';
 import AppError from '../../errors/AppErrors';
 import { Product } from '../product/model.product';
 import { Order } from './model.order';
+import { Cart } from '../cart/model.cart';
 import { generateOrderNumber } from './utils.order';
 import { FREE_SHIPPING_THRESHOLD, SHIPPING_CHARGE } from './const.order';
 import { TOrder, TOrderStatus, TPaymentStatus } from './interface.order';
@@ -98,6 +99,9 @@ const placeOrder = async (
 
     // 5. Auto-save the shipping address to the user's profile (fire-and-forget)
     userServices.autoSaveAddressFromOrder(userId, shippingAddress);
+
+    // 6. Clear cart items after successful order
+    await Cart.findOneAndUpdate({ user: userId }, { items: [] });
 
     return order;
 };

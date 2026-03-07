@@ -154,3 +154,30 @@ export interface TCart {
   createdAt?: string;
   updatedAt?: string;
 }
+
+// ─── User & Address Types ───────────────────────────────────────────────────
+
+export interface TSavedAddress {
+  _id?: string;
+  label?: string;        // e.g. "Home", "Office"
+  fullName: string;
+  phone: string;
+  address: string;
+  city: string;
+  district: string;
+  postalCode?: string;
+  country?: string;
+  isDefault?: boolean;
+}
+
+export interface TUser {
+  _id?: string;
+  username: string;
+  email: string;
+  contactNumber: string;
+  address?: string;
+  profilePicture?: string;
+  role: 'user' | 'admin' | 'superAdmin';
+  isBlocked?: boolean;
+  savedAddresses?: TSavedAddress[];
+}

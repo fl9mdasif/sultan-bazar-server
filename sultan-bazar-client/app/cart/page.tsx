@@ -87,7 +87,7 @@ function CartItemRow({ item }: { item: TCartItem }) {
                 <button
                     onClick={() => handleUpdateQuantity(item.quantity - 1)}
                     disabled={item.quantity <= 1 || isUpdating}
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-orange-50 disabled:opacity-30 transition-colors"
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-orange-50 disabled:opacity-30 transition-colors cursor-pointer"
                 >
                     <Minus className="w-3.5 h-3.5" />
                 </button>
@@ -97,7 +97,7 @@ function CartItemRow({ item }: { item: TCartItem }) {
                 <button
                     onClick={() => handleUpdateQuantity(item.quantity + 1)}
                     disabled={isUpdating || item.quantity >= variant.stock}
-                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-orange-50 disabled:opacity-30 transition-colors"
+                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-orange-50 disabled:opacity-30 transition-colors cursor-pointer"
                 >
                     <Plus className="w-3.5 h-3.5" />
                 </button>
@@ -109,7 +109,7 @@ function CartItemRow({ item }: { item: TCartItem }) {
                 <button
                     onClick={handleRemove}
                     disabled={isRemoving}
-                    className="text-gray-400 hover:text-red-500 p-2 transition-colors disabled:opacity-50"
+                    className="text-gray-400 hover:text-red-500 p-2 transition-colors disabled:opacity-50 cursor-pointer"
                     title="Remove item"
                 >
                     <Trash2 className="w-4 h-4" />
@@ -121,7 +121,7 @@ function CartItemRow({ item }: { item: TCartItem }) {
 
 // ── Main Cart Page ───────────────────────────────────────────────────────────
 export default function CartPage() {
-    const { data: cartData, isLoading, isError } = useGetCartQuery({});
+    const { data: cartData, refetch, isLoading, isError } = useGetCartQuery({});
     const cart = cartData as TCart | undefined;
 
     // console.log('cart', cartData)
@@ -157,7 +157,7 @@ export default function CartPage() {
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Your cart is empty</h1>
                 <p className="text-gray-500 mb-8 max-w-xs text-center">Looks like you haven't added anything to your cart yet. Let's find something amazing for you!</p>
                 <Link href="/products">
-                    <Button className="rounded-full px-8 py-6 text-base font-semibold group" style={{ background: "#B5451B" }}>
+                    <Button className="rounded-full px-8 py-6 text-base font-semibold group cursor-pointer" style={{ background: "#B5451B" }}>
                         Start Shopping
                         <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Button>
@@ -226,10 +226,12 @@ export default function CartPage() {
                                     <span className="text-3xl font-black" style={{ color: "#B5451B" }}>৳{total}</span>
                                 </div>
 
-                                <Button className="w-full py-7 rounded-2xl text-lg font-bold shadow-xl hover:shadow-2xl transition-all active:scale-[0.98] group" style={{ background: "#B5451B" }}>
-                                    Proceed to Checkout
-                                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </Button>
+                                <Link href="/checkout">
+                                    <Button className="w-full py-7 rounded-2xl text-lg font-bold shadow-xl hover:shadow-2xl transition-all active:scale-[0.98] group cursor-pointer" style={{ background: "#B5451B" }}>
+                                        Proceed to Checkout
+                                        <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                    </Button>
+                                </Link>
 
                                 <div className="mt-6 flex items-center justify-center gap-2 text-xs text-gray-400 font-medium">
                                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -249,7 +251,7 @@ export default function CartPage() {
                                     placeholder="Enter code"
                                     className="flex-1 bg-gray-50 border border-orange-100 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#B5451B] transition-colors"
                                 />
-                                <Button variant="outline" className="rounded-xl border-[#B5451B] text-[#B5451B] font-bold">Apply</Button>
+                                <Button variant="outline" className="rounded-xl border-[#B5451B] text-[#B5451B] font-bold cursor-pointer">Apply</Button>
                             </div>
                         </div>
                     </aside>

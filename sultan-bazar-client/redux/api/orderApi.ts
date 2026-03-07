@@ -10,7 +10,7 @@ const orderApi = baseApi.injectEndpoints({
                 method: "POST",
                 data,
             }),
-            invalidatesTags: [tagTypes.orders],
+            invalidatesTags: [tagTypes.orders, tagTypes.cart],
         }),
 
         // Get All Orders (Admin)
