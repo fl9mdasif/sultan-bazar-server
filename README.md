@@ -21,6 +21,7 @@ The application employs a strict Role-Based Access Control (RBAC) system with di
 - **Live Order Tracking**: A dynamic, visual progress bar (`Placed -> Confirmed -> Processing -> Shipped -> Delivered`) that updates in real-time via RTK Query polling (5s intervals).
 - **Product Reviews**: Customers can leave transparent reviews for successfully delivered products natively from their "To Review" tab.
 - **Quick Cancellations**: Option to cancel orders directly from the dashboard before they are processed.
+- **Account Settings**: Dedicated profile management to update personal information, securely change passwords, and manage default shipping/billing addresses.
 
 #### 2. Admin Dashboard
 ![Admin Dashboard](https://i.ibb.co.com/N6mNvpZv/admin-dashboard.png)
@@ -29,6 +30,13 @@ The application employs a strict Role-Based Access Control (RBAC) system with di
   - **Order Status Pie Chart** visually breaking down the lifecycle distribution of current orders.
 - **Financial Metrics**: Real-time revenue calculation aggregating successfully delivered orders. 
 - **Entity Management**: Full CRUD interfaces to manage Products, Categories, Users, and moderate incoming Orders (status updates).
+- **Admin Settings**: Options to modify administrator profile details and manage core store configurations.
+- **Sidebar Navigation**: Centralized, sticky navigation drawer (mobile-friendly) linking directly to:
+  - **Dashboard**: High-level overview & analytics.
+  - **Categories & Products**: Inventory control and tag grouping.
+  - **Orders**: Full transaction lifecycle management and fulfillment.
+  - **Users**: CRM interface to view all registered customers and their history.
+  - **Settings**: Store and profile configurations.
 
 #### 3. Superadmin Dashboard
 - Features all privileges of the standard Admin, plus enhanced system control, global settings management, and the ability to oversee other administrators.
