@@ -49,7 +49,9 @@ export default function AdminDashboard() {
     const shippedOrders = ordersArray.filter((o: any) => o.orderStatus === "shipped").length;
     const completedOrders = ordersArray.filter((o: any) => o.orderStatus === "delivered").length;
     const cancelledOrders = ordersArray.filter((o: any) => o.orderStatus === "cancelled").length;
-    const revenue = ordersArray.reduce((acc: number, o: any) => acc + (o.totalAmount || 0), 0);
+    const revenue = ordersArray
+        .filter((o: any) => o.orderStatus === "delivered")
+        .reduce((acc: number, o: any) => acc + (o.totalAmount || 0), 0);
 
     // Recent orders (last 5)
     const recentOrders = [...ordersArray]
@@ -64,7 +66,7 @@ export default function AdminDashboard() {
         { label: "Shipped", value: shippedOrders, icon: Truck, color: "#2563eb", bg: "#2563eb15" },
         { label: "Number of sales", value: completedOrders, icon: CheckCircle, color: "#16a34a", bg: "#16a34a15" },
         { label: "Cancelled", value: cancelledOrders, icon: XCircle, color: "#dc2626", bg: "#dc262615" },
-        { label: "Revenue", value: `৳${revenue.toLocaleString()}`, icon: TrendingUp, color: "#059669", bg: "#05966915" },
+        { label: "Total sales", value: `৳${revenue.toLocaleString()}`, icon: TrendingUp, color: "#059669", bg: "#05966915" },
     ];
 
     const statusColor = (s: string) =>

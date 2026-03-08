@@ -55,7 +55,9 @@ export default function SuperAdminDashboard() {
     const shippedOrders = ordersArray.filter((o: any) => o.orderStatus === "shipped").length;
     const completedOrders = ordersArray.filter((o: any) => o.orderStatus === "delivered").length;
     const cancelledOrders = ordersArray.filter((o: any) => o.orderStatus === "cancelled").length;
-    const revenue = ordersArray.reduce((acc: number, o: any) => acc + (o.totalAmount || 0), 0);
+    const revenue = ordersArray
+        .filter((o: any) => o.orderStatus === "delivered")
+        .reduce((acc: number, o: any) => acc + (o.totalAmount || 0), 0);
 
     const recentOrders = [...ordersArray]
         .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
