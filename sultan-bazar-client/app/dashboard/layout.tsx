@@ -2,9 +2,9 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     return (
-        <div className="flex min-h-screen" style={{ background: "#F7F7F5" }}>
+        <div className="flex flex-col lg:flex-row min-h-screen" style={{ background: "#F7F7F5" }}>
             <DashboardSidebar />
-            <main className="flex-1 overflow-y-auto pt-14 lg:pt-0">
+            <main className="flex-1 overflow-y-auto">
                 {children}
             </main>
         </div>

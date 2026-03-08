@@ -31,9 +31,11 @@ const navByRole: Record<string, { label: string; href: string; icon: React.Eleme
     ],
     user: [
         { label: "Dashboard", href: "/dashboard/user", icon: LayoutDashboard },
+        { label: "My Orders", href: "/dashboard/user/orders", icon: ShoppingCart },
         { label: "Settings", href: "/dashboard/user/settings", icon: Settings },
         // { label: "My Orders", href: "/dashboard/user/orders", icon: ShoppingCart },
     ],
+
 };
 
 const roleLabels: Record<string, { label: string; color: string }> = {
@@ -155,23 +157,27 @@ export default function DashboardSidebar() {
 
     return (
         <>
-            {/* Desktop sidebar */}
+            {/* ── Desktop sidebar ── */}
             <aside className="hidden lg:flex flex-col w-60 bg-white border-r border-gray-100 h-screen sticky top-0 flex-shrink-0">
                 <SidebarContent />
             </aside>
 
-            {/* Mobile: floating hamburger button + slide-in drawer */}
-            {/* NOTE: This wrapper has NO width (fixed + w-0) so it never takes */}
-            {/* space in the flex row – the main content fills the full width.   */}
-            <div className="lg:hidden fixed top-0 left-0 z-30 w-0 h-0">
-                {/* Hamburger – fixed so it floats above content, takes no space */}
-                <button
-                    onClick={() => setMobileOpen(true)}
-                    className="fixed top-3 left-3 p-2 rounded-lg bg-white shadow-md text-gray-600 hover:text-[#B5451B] hover:shadow-lg transition-all"
-                    aria-label="Open menu"
-                >
-                    <Menu className="w-5 h-5" />
-                </button>
+            {/* ── Mobile ──────────────────────────────────────────────────────
+                The sticky bar sits in normal document flow (below the global Navbar)
+                so it is always visible. The drawer / overlay use fixed positioning. */}
+            <div className="lg:hidden">
+                {/* Sticky top bar – always visible, zero flex-row width impact
+                    because we position it as full-width block above <main> in layout */}
+                <div className="sticky top-0 z-20 flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-100 shadow-sm">
+                    <button
+                        onClick={() => setMobileOpen(true)}
+                        className="p-2 rounded-xl bg-gray-50 hover:bg-orange-50 text-gray-600 hover:text-[#B5451B] transition-all border border-gray-200"
+                        aria-label="Open menu"
+                    >
+                        <Menu className="w-5 h-5" />
+                    </button>
+                    <span className="text-sm font-semibold text-gray-700">Sidebar Menu</span>
+                </div>
 
                 {/* Overlay */}
                 {mobileOpen && (
@@ -181,7 +187,7 @@ export default function DashboardSidebar() {
                     />
                 )}
 
-                {/* Drawer */}
+                {/* Slide-in Drawer */}
                 <div
                     ref={sidebarRef}
                     className={`fixed top-0 left-0 h-full w-64 bg-white z-50 shadow-2xl transition-transform duration-300 ${mobileOpen ? "translate-x-0" : "-translate-x-full"}`}

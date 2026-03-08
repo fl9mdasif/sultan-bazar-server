@@ -1,13 +1,82 @@
 "use client";
 
 import { useState } from "react";
-import { Package, Star, Clock, CheckCircle, Truck, PackageOpen, XCircle, Loader2 } from "lucide-react";
+
+import { Package, Star, Clock, CheckCircle, Truck, PackageOpen, XCircle, Loader2, Ban } from "lucide-react";
 import Image from "next/image";
 import { ReviewModal } from "@/components/dashboard/ReviewModal";
 import Link from "next/link";
 import { TOrder, TOrderItem } from "@/types/common";
 import { useCancelOrderMutation } from "@/redux/api/orderApi";
 import { toast } from "sonner";
+
+// ── Order status tracker ──────────────────────────────────────────────────────
+const ORDER_STEPS = [
+    { key: "pending", label: "Placed" },
+    { key: "confirmed", label: "Confirmed" },
+    { key: "processing", label: "Processing" },
+    { key: "shipped", label: "Shipped" },
+    { key: "delivered", label: "Delivered" },
+];
+
+function OrderStatusTracker({ status }: { status: string }) {
+    if (status === "cancelled" || status === "returned") {
+        return (
+            <div className="flex items-center gap-2 my-4 px-4 py-2.5 bg-red-50 border border-red-100 rounded-xl">
+                <Ban className="w-4 h-4 text-red-500 flex-shrink-0" />
+                <span className="text-sm font-semibold text-red-600 capitalize">Order {status}</span>
+            </div>
+        );
+    }
+
+    const currentIdx = ORDER_STEPS.findIndex(s => s.key === status);
+
+    return (
+        <div className="my-4">
+            <div className="flex items-center w-full">
+                {ORDER_STEPS.map((step, idx) => {
+                    // When status is "delivered" (last step), mark ALL steps as done (green)
+                    const isDelivered = status === "delivered";
+                    const isDone = isDelivered ? idx <= currentIdx : idx < currentIdx;
+                    const isCurrent = !isDelivered && idx === currentIdx;
+
+                    return (
+                        <div key={step.key} className="flex items-center flex-1 last:flex-none">
+                            {/* Circle */}
+                            <div className="flex flex-col items-center">
+                                <div
+                                    className={`w-5 h-5 rounded-full flex items-center justify-center border-2 transition-all flex-shrink-0
+                                        ${isDone
+                                            ? "bg-green-500 border-green-500"
+                                            : isCurrent
+                                                ? "bg-[#B5451B] border-[#B5451B] ring-2 ring-orange-200 animate-pulse"
+                                                : "bg-white border-gray-200"
+                                        }`}
+                                >
+                                    {isDone && (
+                                        <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    )}
+                                </div>
+                                <span className={`text-[9px] font-semibold mt-1 whitespace-nowrap
+                                    ${isDone ? "text-green-600" : isCurrent ? "text-[#B5451B]" : "text-gray-400"}`}>
+                                    {step.label}
+                                </span>
+                            </div>
+                            {/* Connector line */}
+                            {idx < ORDER_STEPS.length - 1 && (
+                                <div className={`h-0.5 flex-1 mx-1 rounded-full transition-all
+                                    ${isDone ? "bg-green-400" : "bg-gray-200"}`}
+                                />
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
 
 const TABS = [
     { id: "all", label: "All Orders", icon: Package },
@@ -118,7 +187,7 @@ export function OrdersList({ orders, title, description, showTabs = true }: Orde
                         <div key={order._id} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm">
 
                             {/* Order Header info */}
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-100 pb-4 mb-4 gap-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-100 pb-4 mb-1 gap-4">
                                 <div>
                                     <p className="text-sm text-gray-500">
                                         Order <span className="font-semibold text-gray-900">#{order.orderNumber}</span>
@@ -145,14 +214,14 @@ export function OrdersList({ orders, title, description, showTabs = true }: Orde
                                                         <button
                                                             disabled={isCancelling}
                                                             onClick={() => handleCancelOrder(order._id)}
-                                                            className="text-[10px] font-bold text-red-600 hover:text-red-700 flex items-center gap-1 px-2 py-1 bg-red-50 rounded-md border border-red-100 transition-colors"
+                                                            className="text-[10px] font-bold text-red-600 bg-red-500 text-white hover:bg-red-600 flex items-center gap-1 px-2 py-1 rounded-md transition-colors"
                                                         >
                                                             {isCancelling ? <Loader2 className="w-3 h-3 animate-spin" /> : "Confirm"}
                                                         </button>
                                                         <button
                                                             disabled={isCancelling}
                                                             onClick={() => setCancellingOrderId(null)}
-                                                            className="text-[10px] font-bold text-gray-400 hover:text-gray-600"
+                                                            className="text-[10px] font-bold bg-green-500 text-white hover:bg-green-600 px-2 py-1 rounded-md"
                                                         >
                                                             No, I changed my mind
                                                         </button>
@@ -170,6 +239,9 @@ export function OrdersList({ orders, title, description, showTabs = true }: Orde
                                     </div>
                                 </div>
                             </div>
+
+                            {/* ── Order Status Tracker ── */}
+                            <OrderStatusTracker status={order.orderStatus} />
 
                             {/* Order Items */}
                             <div className="space-y-4">
