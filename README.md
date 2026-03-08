@@ -1,25 +1,8 @@
 # 🌿 Sultan Bazar (সূলতান বাজার) - E-Commerce Platform
 
-![Sultan Bazar Cover Image](https://via.placeholder.com/1200x400.png?text=Sultan+Bazar+-+100%25+Natural+Spices,+Oils+%26+Cooking+Essentials)
 
 **Sultan Bazar** is a full-featured, high-performance E-Commerce platform built for selling 100% natural spices, oils, and cooking essentials. Designed with a robust architecture and a beautiful modern user interface, the platform offers a seamless shopping experience for customers and powerful management tools for administrators.
 
-## 🚀 Tech Stack
-
-### Frontend Architecture
-- **Framework**: [Next.js 16 (App Router)](https://nextjs.org/) - Server-Side Rendering (SSR) & Static Site Generation (SSG) for optimal SEO and performance.
-- **State Management**: [Redux Toolkit (RTK) & RTK Query](https://redux-toolkit.js.org/) - Efficient client state management and real-time backend data fetching with built-in caching and polling mechanisms.
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) & [shadcn/ui](https://ui.shadcn.com/) - Utility-first styling with accessible, highly customizable UI components.
-- **Data Visualization**: [Recharts](https://recharts.org/) - dynamic, responsive SVGs for sales and order analytics.
-- **Icons**: [Lucide React](https://lucide.dev/)
-
-### Backend Architecture
-- **Runtime**: [Node.js](https://nodejs.org/) & [Express](https://expressjs.com/)
-- **Database**: [MongoDB](https://www.mongodb.com/) with [Mongoose ODM](https://mongoosejs.com/)
-- **Language**: TypeScript - End-to-end type safety across the entire stack.
-- **Authentication**: JWT (JSON Web Tokens) with role-based routing (Customer, Admin, Superadmin).
-
----
 
 ## ✨ Key Features
 
@@ -58,6 +41,24 @@ The application employs a strict Role-Based Access Control (RBAC) system with di
 2. **Real-time UX Strategy**: Instead of heavyweight WebSockets for order tracking, the app utilizes RTK Query's built-in `pollingInterval` on targeted views (like the User's Active Orders). This provides the illusion of real-time updates when an Admin changes a status, without sacrificing server resources.
 3. **Component Reusability**: Complex layouts like `OrdersList` handle their own internal data-tabbing logic cleanly while utilizing highly specific UI sub-components (like `OrderStatusTracker`).
 4. **Optimized Typing**: Complex external library dependencies (like Recharts formatting callbacks) are effectively typed to prevent production-build crashes while retaining strict TS compiler rules elsewhere.
+
+---
+
+
+## 🚀 Tech Stack
+
+### Frontend Architecture
+- **Framework**: [Next.js 16 (App Router)](https://nextjs.org/) - Server-Side Rendering (SSR) & Static Site Generation (SSG) for optimal SEO and performance.
+- **State Management**: [Redux Toolkit (RTK) & RTK Query](https://redux-toolkit.js.org/) - Efficient client state management and real-time backend data fetching with built-in caching and polling mechanisms.
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) & [shadcn/ui](https://ui.shadcn.com/) - Utility-first styling with accessible, highly customizable UI components.
+- **Data Visualization**: [Recharts](https://recharts.org/) - dynamic, responsive SVGs for sales and order analytics.
+- **Icons**: [Lucide React](https://lucide.dev/)
+
+### Backend Architecture
+- **Runtime**: [Node.js](https://nodejs.org/) & [Express](https://expressjs.com/)
+- **Database**: [MongoDB](https://www.mongodb.com/) with [Mongoose ODM](https://mongoosejs.com/)
+- **Language**: TypeScript - End-to-end type safety across the entire stack.
+- **Authentication**: JWT (JSON Web Tokens) with role-based routing (Customer, Admin, Superadmin).
 
 ---
 
