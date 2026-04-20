@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search, SlidersHorizontal, X, ChevronDown, ChevronUp, ShoppingCart, Heart, Star, Filter, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,8 +13,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { useAddToCartMutation } from "@/redux/api/cartApi";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { isLoggedIn } from "@/services/auth.services";
+import { useAppDispatch } from "@/redux/hooks";
+import { addItemToLocalCart } from "@/redux/features/localCartSlice";
 
 const SORT_OPTIONS = [
     { label: "Newest", value: "-createdAt" },
@@ -42,6 +44,8 @@ function Stars({ rating }: { rating: number }) {
 function ProductCard({ p }: { p: TProduct }) {
     const [wished, setWished] = useState(false);
     const [addToCart, { isLoading: isAdding }] = useAddToCartMutation();
+    const [localAdding, setLocalAdding] = useState(false);
+    const dispatch = useAppDispatch();
 
     const variant = p.variants?.[0];
     if (!variant) return null;
@@ -62,8 +66,11 @@ function ProductCard({ p }: { p: TProduct }) {
         e.stopPropagation();
 
         if (!isLoggedIn()) {
-            toast.error("Please login to add items to cart");
-            router.push(`/login?from=/products`);
+            // Guest: save to localStorage cart
+            setLocalAdding(true);
+            dispatch(addItemToLocalCart({ product: p, variant, quantity: 1 }));
+            toast.success(`${p.name} added to cart!`);
+            setTimeout(() => setLocalAdding(false), 600);
             return;
         }
 
@@ -79,12 +86,14 @@ function ProductCard({ p }: { p: TProduct }) {
         }
     };
 
+    const adding = isAdding || localAdding;
+
     return (
         <Link href={`/products/${p._id}`}>
             <div className="hover-lift bg-white rounded-2xl overflow-hidden border flex flex-col group h-full cursor-pointer"
                 style={{ border: "1.5px solid #F0E6D3" }}>
                 {/* Image */}
-                <div className="relative aspect-square bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center overflow-hidden">
+                <div className="relative aspect-square from-amber-50 to-orange-50 flex items-center justify-center overflow-hidden">
                     {p.thumbnail ? (
                         <Image
                             src={p.thumbnail}
@@ -139,14 +148,14 @@ function ProductCard({ p }: { p: TProduct }) {
                             onClick={handleAddToCart}
                             className="w-full cursor-pointer text-white text-xs font-semibold rounded-full py-1.5 h-auto transition-all hover:opacity-90 active:scale-95"
                             style={{ background: "#B5451B" }}
-                            disabled={!inStock || isAdding}
+                            disabled={!inStock || adding}
                         >
-                            {isAdding ? (
+                            {adding ? (
                                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
                             ) : (
                                 <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />
                             )}
-                            {isAdding ? "Adding..." : "Add to Cart"}
+                            {adding ? "Adding..." : "Add to Cart"}
                         </Button>
                     </div>
                 </div>
@@ -311,6 +320,22 @@ export default function ProductsPage() {
     const { data: categoryData } = useGetAllCategoriesQuery({});
     const categories: TCategory[] = categoryData || [];
 
+    const searchParams = useSearchParams();
+    const urlCategory = searchParams.get("category");
+
+    // Sync URL category parameter with state
+    useEffect(() => {
+        if (urlCategory && categories.length > 0) {
+            const matchedCat = categories.find(
+                (c) => c.name.toLowerCase() === urlCategory.toLowerCase()
+            );
+            if (matchedCat) {
+                setSelectedCategory(matchedCat._id);
+                setPage(1);
+            }
+        }
+    }, [urlCategory, categories]);
+
     // Fetch Products with real filters
     const { data: productsData, isLoading, isError } = useGetAllProductsQuery({
         search: search || undefined,
@@ -327,6 +352,8 @@ export default function ProductsPage() {
     const products = productsData?.data || [];
     const meta = productsData?.meta;
     const totalPages = meta?.totalPages || 1;
+
+    // console.log("product", products)
 
     // Reset page if filters change
     const handleFilterChange = (setter: any) => (v: any) => {

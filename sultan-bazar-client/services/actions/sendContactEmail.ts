@@ -17,7 +17,7 @@ export async function sendContactEmail(formData: {
                 Authorization: `Bearer ${process.env.PLUNK_SECRET_KEY}`,
             },
             body: JSON.stringify({
-                to: process.env.ADMIN_EMAIL || "asifalazadami2016@gmail.com",
+                to: process.env.ADMIN_EMAIL,
                 subject: `Contact: ${subject || "New Message from Sultan Bazar"}`,
                 body: `
                     <div style="font-family: sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; border: 1px solid #eee; padding: 20px; border-radius: 10px;">

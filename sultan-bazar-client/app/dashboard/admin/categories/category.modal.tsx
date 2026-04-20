@@ -26,6 +26,7 @@ export function CategoryModal({
     saving: boolean;
 }) {
     const [form, setForm] = useState<ReturnType<typeof emptyForm>>(initial ?? emptyForm());
+    const [errors, setErrors] = useState<Record<string, string>>({});
     const [uploading, setUploading] = useState(false);
     const [dragOver, setDragOver] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -33,12 +34,37 @@ export function CategoryModal({
     useEffect(() => {
         if (open) {
             setForm(initial ?? emptyForm());
+            setErrors({});
         }
     }, [open, initial]);
 
     if (!open) return null;
 
-    const setField = (k: keyof typeof form, v: string | boolean | number) => setForm((f) => ({ ...f, [k]: v }));
+    const setField = (k: keyof typeof form, v: string | boolean | number) => {
+        setForm((f) => ({ ...f, [k]: v }));
+        if (errors[k]) {
+            setErrors(prev => {
+                const next = { ...prev };
+                delete next[k];
+                return next;
+            });
+        }
+    };
+
+    const validate = () => {
+        const newErrors: Record<string, string> = {};
+        if (!form.name.trim()) newErrors.name = "Category name is required";
+        if (!form.slug.trim()) newErrors.slug = "Slug is required for URLs";
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSave = () => {
+        if (validate()) {
+            onSave(form);
+        }
+    };
 
     const handleImageUpload = async (file: File) => {
         if (!file.type.startsWith("image/")) return;
@@ -80,22 +106,26 @@ export function CategoryModal({
                 </div>
 
                 {/* Body */}
-                <div className="overflow-y-auto flex-1 px-6 py-5 space-y-4">
+                <div className="overflow-y-auto flex-1 px-6 py-5 space-y-4 text-left">
                     <div>
-                        <label className="label">Category Name *</label>
-                        <input className="input-field" value={form.name}
+                        <label className={`label ${errors.name ? "text-red-500" : ""}`}>Category Name *</label>
+                        <input className={`input-field ${errors.name ? "border-red-400 focus:border-red-500 bg-red-50/10" : ""}`}
+                            value={form.name}
                             onChange={(e) => {
                                 setField("name", e.target.value);
                                 if (!initial?.slug) {
                                     setField("slug", e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
                                 }
                             }} placeholder="e.g. Spices" />
+                        {errors.name && <p className="text-[10px] font-bold text-red-500 mt-1 uppercase tracking-tight">{errors.name}</p>}
                     </div>
 
                     <div>
-                        <label className="label">Slug * (used in URL)</label>
-                        <input className="input-field" value={form.slug}
+                        <label className={`label ${errors.slug ? "text-red-500" : ""}`}>Slug * (used in URL)</label>
+                        <input className={`input-field ${errors.slug ? "border-red-400 focus:border-red-500 bg-red-50/10" : ""}`}
+                            value={form.slug}
                             onChange={(e) => setField("slug", e.target.value)} placeholder="e.g. spices" />
+                        {errors.slug && <p className="text-[10px] font-bold text-red-500 mt-1 uppercase tracking-tight">{errors.slug}</p>}
                     </div>
 
                     <div>
@@ -188,7 +218,7 @@ export function CategoryModal({
                 {/* Footer */}
                 <div className="flex items-center justify-end gap-3 px-6 py-4 border-t">
                     <Button variant="outline" onClick={onClose} className="rounded-xl">Cancel</Button>
-                    <Button disabled={saving || uploading} onClick={() => onSave(form)}
+                    <Button disabled={saving || uploading} onClick={handleSave}
                         className="rounded-xl text-white"
                         style={{ background: "linear-gradient(135deg, #B5451B, #D4860A)" }}>
                         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Category"}

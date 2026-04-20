@@ -57,7 +57,7 @@ export default function Hero() {
     const slide = SLIDES[current];
 
     return (
-        <section className="relative w-full overflow-hidden" style={{ height: "100vh" }}>
+        <section className="relative w-full overflow-hidden h-[35vh] sm:h-[50vh] md:h-screen">
 
             {/* ── Slide Images ── */}
             {SLIDES.map((s, i) => (
@@ -74,18 +74,18 @@ export default function Hero() {
                         priority={i === 0}
                     />
                     {/* Dark overlay for text readability */}
-                    <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.42)" }} />
+                    <div className="absolute inset-0" style={{ background: "rgba(0,0,0,0.35)" }} />
                 </div>
             ))}
 
             {/* ── Centered Text Content ── */}
             <div
-                className="absolute inset-0 flex flex-col items-center justify-center text-center z-10 px-6"
+                className="absolute inset-0 flex flex-col items-center justify-center text-center z-10 px-4 sm:px-6"
                 style={{ opacity: animating ? 0 : 1, transition: "opacity 0.3s ease" }}
             >
                 {/* Badge */}
                 <span
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-1.5 rounded-full mb-5"
+                    className="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-semibold px-3 py-1 sm:px-4 sm:py-1.5 rounded-full mb-3 sm:mb-5"
                     style={{ background: "rgba(255,255,255,0.15)", color: "#F5D078", border: "1px solid rgba(245,208,120,0.4)", backdropFilter: "blur(4px)" }}
                 >
                     {slide.badge}
@@ -93,75 +93,69 @@ export default function Hero() {
 
                 {/* Main headline */}
                 <h1
-                    className="font-bengali text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight drop-shadow-lg"
+                    className="font-bengali text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2 sm:mb-4 leading-tight drop-shadow-lg"
                     style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}
                 >
                     {slide.headline}
                 </h1>
 
                 {/* Divider */}
-                <div className="flex items-center gap-3 mb-2">
-                    <div className="h-px w-16 bg-[#D4860A]" />
-                    <span className="text-xs font-bold tracking-[0.3em] uppercase" style={{ color: "#D4860A" }}>
+                <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+                    <div className="h-px w-8 sm:w-16 bg-[#D4860A]" />
+                    <span className="text-[8px] sm:text-xs font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase" style={{ color: "#D4860A" }}>
                         {slide.sub}
                     </span>
-                    <div className="h-px w-16 bg-[#D4860A]" />
+                    <div className="h-px w-8 sm:w-16 bg-[#D4860A]" />
                 </div>
 
                 {/* Coupon */}
-                <p className="text-sm text-white/80 mb-7 tracking-widest uppercase">
+                <p className="text-[10px] sm:text-sm text-white/80 mb-4 sm:mb-7 tracking-widest uppercase">
                     Use Coupon :{" "}
-                    <span className="font-bold text-white bg-white/20 px-2 py-0.5 rounded">
+                    <span className="font-bold text-white bg-white/20 px-1.5 py-0.5 rounded">
                         {slide.coupon}
                     </span>
                 </p>
 
                 {/* CTA */}
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                     <Link
                         href={slide.cta.href}
-                        className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-bold text-sm transition-all hover:scale-105"
+                        className="inline-flex items-center gap-2 px-6 py-2 sm:px-8 sm:py-3 rounded-full font-bold text-[10px] sm:text-sm transition-all hover:scale-105"
                         style={{ background: "linear-gradient(135deg, #B5451B, #D4860A)", color: "white", boxShadow: "0 4px 20px rgba(181,69,27,0.5)" }}
                     >
                         {slide.cta.label} →
                     </Link>
-                    {/* <Link
-                        href="/categories"
-                        className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-bold text-sm transition-all hover:scale-105 bg-white/15 backdrop-blur-sm border border-white/30 text-white hover:bg-white/25"
-                    >
-                        View Categories
-                    </Link> */}
                 </div>
             </div>
 
             {/* ── Prev / Next Arrows ── */}
             <button
                 onClick={prev}
-                className="absolute left-4 lg:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                className="absolute left-2 sm:left-4 lg:left-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
                 style={{ background: "rgba(255,255,255,0.18)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,0.3)", color: "white" }}
                 aria-label="Previous slide"
             >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
             <button
                 onClick={next}
-                className="absolute right-4 lg:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                className="absolute right-2 sm:right-4 lg:right-6 top-1/2 -translate-y-1/2 z-20 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
                 style={{ background: "rgba(255,255,255,0.18)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,0.3)", color: "white" }}
                 aria-label="Next slide"
             >
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
 
             {/* ── Dot Indicators ── */}
-            <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+            <div className="absolute bottom-3 sm:bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 sm:gap-2">
                 {SLIDES.map((_, i) => (
                     <button
                         key={i}
                         onClick={() => goTo(i)}
                         className="transition-all rounded-full"
                         style={{
-                            width: i === current ? 24 : 8,
-                            height: 8,
+                            width: i === current ? (window.innerWidth < 640 ? 16 : 24) : 8,
+                            height: 6,
                             background: i === current ? "#D4860A" : "rgba(255,255,255,0.5)",
                         }}
                         aria-label={`Go to slide ${i + 1}`}
@@ -171,11 +165,12 @@ export default function Hero() {
 
             {/* ── Slide counter ── */}
             <div
-                className="absolute top-4 right-4 z-20 text-xs font-bold text-white/70"
+                className="absolute top-2 right-2 sm:top-4 sm:right-4 z-20 text-[10px] sm:text-xs font-bold text-white/70"
                 style={{ letterSpacing: "0.1em" }}
             >
                 {String(current + 1).padStart(2, "0")} / {String(SLIDES.length).padStart(2, "0")}
             </div>
+
         </section>
     );
 }

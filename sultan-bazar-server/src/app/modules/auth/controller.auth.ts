@@ -4,7 +4,7 @@ import { response } from '../../utils/sendResponse';
 import { authServices } from './service.auth';
 
 const registerUser = catchAsync(async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
 
   const result = await authServices.registerUser(req.body);
 
@@ -61,6 +61,38 @@ const logoutUser = catchAsync(async (req, res) => {
   });
 });
 
+// guest checkout — find-or-create user with real email, return token
+const guestCheckout = catchAsync(async (req, res) => {
+  const { email, fullName, phone } = req.body;
+  const result = await authServices.guestCheckout(email, fullName, phone);
+
+  const { accessToken, refreshToken } = result;
+
+  if (refreshToken) {
+    res.cookie('refreshToken', refreshToken, {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      sameSite: 'lax',
+    });
+  }
+
+  res.cookie('accessToken', accessToken, {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: 'lax',
+  });
+
+  response.createSendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Guest checkout initialized successfully',
+    data: {
+      user: result.user,
+      accessToken,
+    },
+  });
+});
+
 // // change password
 const changePassword = catchAsync(async (req, res) => {
   const { ...passwordData } = req.body;
@@ -103,4 +135,5 @@ export const authControllers = {
   changePassword,
   refreshToken,
   logoutUser,
+  guestCheckout,
 };

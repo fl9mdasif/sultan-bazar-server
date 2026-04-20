@@ -15,6 +15,8 @@ import { useAddToCartMutation } from "@/redux/api/cartApi";
 import { TProduct, TVariant } from "@/types/common";
 import { toast } from "sonner";
 import { isLoggedIn } from "@/services/auth.services";
+import { useAppDispatch } from "@/redux/hooks";
+import { addItemToLocalCart } from "@/redux/features/localCartSlice";
 
 function Stars({ rating, size = "sm" }: { rating: number; size?: "sm" | "md" }) {
     const s = size === "sm" ? "w-3.5 h-3.5" : "w-5 h-5";
@@ -37,6 +39,7 @@ export default function ProductDetailPage() {
     const { data: singleProduct, isLoading, isError } = useGetSingleProductQuery(id);
     const { data: products } = useGetAllProductsQuery({ limit: 4 });
     const [addToCart, { isLoading: isAddingToCart }] = useAddToCartMutation();
+    const dispatch = useAppDispatch();
 
     // console.log("singleProduct", singleProduct); // ok
     // console.log("all products", products); // ok
@@ -93,15 +96,18 @@ export default function ProductDetailPage() {
     const handleAddToCart = async (redirect = false) => {
         if (!inStock || isAddingToCart) return;
 
-        if (!isLoggedIn()) {
-            toast.error("Please login to proceed");
-            router.push(`/login?from=/products/${p._id}`);
+        if (redirect) {
+            // "Buy Now" — go straight to checkout with product params
+            router.push(`/checkout?productId=${p._id}&variantId=${selectedVariant._id}&qty=${qty}`);
             return;
         }
 
-        if (redirect) {
-            // "Buy Now" - direct to checkout with single product details
-            router.push(`/checkout?productId=${p._id}&variantId=${selectedVariant._id}&qty=${qty}`);
+        if (!isLoggedIn()) {
+            // Guest: save to localStorage
+            dispatch(addItemToLocalCart({ product: p, variant: selectedVariant, quantity: qty }));
+            setAddedToCart(true);
+            toast.success("Added to cart!");
+            setTimeout(() => setAddedToCart(false), 2000);
             return;
         }
 

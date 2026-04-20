@@ -26,6 +26,7 @@ export function ProductModal({
     categoriesList: TCategory[];
 }) {
     const [form, setForm] = useState<ReturnType<typeof emptyForm>>(initial ?? emptyForm());
+    const [errors, setErrors] = useState<Record<string, string>>({});
     const [uploading, setUploading] = useState(false);
     const [dragOver, setDragOver] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -34,18 +35,65 @@ export function ProductModal({
     useEffect(() => {
         if (open) {
             setForm(initial ?? emptyForm());
+            setErrors({});
         }
     }, [open, initial]);
 
     if (!open) return null;
 
-    const setField = (k: string, v: unknown) => setForm((f) => ({ ...f, [k]: v }));
-    const setVariant = (i: number, k: string, v: unknown) =>
+    const setField = (k: string, v: unknown) => {
+        setForm((f) => ({ ...f, [k]: v }));
+        if (errors[k]) {
+            setErrors(prev => {
+                const next = { ...prev };
+                delete next[k];
+                return next;
+            });
+        }
+    };
+
+    const setVariant = (i: number, k: string, v: unknown) => {
         setForm((f) => {
             const vs = [...f.variants];
             vs[i] = { ...vs[i], [k]: v };
             return { ...f, variants: vs };
         });
+
+        const errorKey = `variant_${i}_${k}`;
+        if (errors[errorKey]) {
+            setErrors(prev => {
+                const next = { ...prev };
+                delete next[errorKey];
+                return next;
+            });
+        }
+    };
+
+    const validate = () => {
+        const newErrors: Record<string, string> = {};
+        if (!form.name.trim()) newErrors.name = "Product name is required";
+        if (!form.category) newErrors.category = "Please select a category";
+        if (!form.slug.trim()) newErrors.slug = "Slug is required";
+        if (!form.description.trim()) newErrors.description = "Description is required";
+        if (!form.thumbnail) newErrors.thumbnail = "Thumbnail image is required";
+
+        form.variants.forEach((v, i) => {
+            if (!v.name.trim()) newErrors[`variant_${i}_name`] = "Required";
+            if (!v.sku.trim()) newErrors[`variant_${i}_sku`] = "Required";
+            if (!v.price || v.price <= 0) newErrors[`variant_${i}_price`] = "Required";
+            if (v.stock === undefined || v.stock <= 0) newErrors[`variant_${i}_stock`] = "Required";
+        });
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSave = () => {
+        if (validate()) {
+            onSave(form);
+        }
+    };
+
     const addVariant = () => setForm((f) => ({ ...f, variants: [...f.variants, emptyVariant()] }));
     const removeVariant = (i: number) =>
         setForm((f) => ({ ...f, variants: f.variants.filter((_, idx) => idx !== i) }));
@@ -90,48 +138,56 @@ export function ProductModal({
                 </div>
 
                 {/* Body */}
-                <div className="overflow-y-auto flex-1 px-6 py-5 space-y-5">
+                <div className="overflow-y-auto flex-1 px-6 py-5 space-y-5 text-left">
                     {/* Basic info */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="label">Product Name *</label>
-                            <input className="input-field" value={form.name}
+                            <label className={`label ${errors.name ? "text-red-500" : ""}`}>Product Name *</label>
+                            <input className={`input-field ${errors.name ? "border-red-400 focus:border-red-500 bg-red-50/10" : ""}`}
+                                value={form.name}
                                 onChange={(e) => {
                                     setField("name", e.target.value);
                                     if (!initial?.slug) {
                                         setField("slug", e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""));
                                     }
                                 }} placeholder="e.g. Mustard Oil" />
+                            {errors.name && <p className="text-[10px] font-bold text-red-500 mt-1 uppercase tracking-tight">{errors.name}</p>}
                         </div>
                         <div>
-                            <label className="label">Category *</label>
-                            <select className="input-field" value={form.category}
+                            <label className={`label ${errors.category ? "text-red-500" : ""}`}>Category *</label>
+                            <select className={`input-field ${errors.category ? "border-red-400 focus:border-red-500 bg-red-50/10" : ""}`}
+                                value={form.category}
                                 onChange={(e) => setField("category", e.target.value)}>
                                 <option value="" disabled>Select a category</option>
                                 {categoriesList.map(c => (
                                     <option key={c._id} value={c._id}>{c.name}</option>
                                 ))}
                             </select>
+                            {errors.category && <p className="text-[10px] font-bold text-red-500 mt-1 uppercase tracking-tight">{errors.category}</p>}
                         </div>
                     </div>
 
                     <div>
-                        <label className="label">Slug * (used in URL)</label>
-                        <input className="input-field" value={form.slug}
+                        <label className={`label ${errors.slug ? "text-red-500" : ""}`}>Slug * (used in URL)</label>
+                        <input className={`input-field ${errors.slug ? "border-red-400 focus:border-red-500 bg-red-50/10" : ""}`}
+                            value={form.slug}
                             onChange={(e) => setField("slug", e.target.value)} placeholder="e.g. mustard-oil" />
+                        {errors.slug && <p className="text-[10px] font-bold text-red-500 mt-1 uppercase tracking-tight">{errors.slug}</p>}
                     </div>
 
                     <div>
-                        <label className="label">Description *</label>
-                        <textarea className="input-field min-h-[80px] resize-none" value={form.description}
+                        <label className={`label ${errors.description ? "text-red-500" : ""}`}>Description *</label>
+                        <textarea className={`input-field min-h-[80px] resize-none ${errors.description ? "border-red-400 focus:border-red-500 bg-red-50/10" : ""}`}
+                            value={form.description}
                             onChange={(e) => setField("description", e.target.value)}
                             placeholder="Product description..." />
+                        {errors.description && <p className="text-[10px] font-bold text-red-500 mt-1 uppercase tracking-tight">{errors.description}</p>}
                     </div>
 
                     {/* Thumbnail Upload + Tags row */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
                         <div>
-                            <label className="label">Thumbnail *</label>
+                            <label className={`label ${errors.thumbnail ? "text-red-500" : ""}`}>Thumbnail *</label>
                             <input
                                 ref={fileInputRef}
                                 type="file"
@@ -170,7 +226,7 @@ export function ProductModal({
                                     onDrop={handleDrop}
                                     onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                                     onDragLeave={() => setDragOver(false)}
-                                    className={`w-full h-32 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-colors ${dragOver ? "border-[#B5451B] bg-orange-50" : "border-gray-200 hover:border-[#B5451B] hover:bg-orange-50/40"
+                                    className={`w-full h-32 rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-colors ${dragOver ? "border-[#B5451B] bg-orange-50" : errors.thumbnail ? "border-red-300 bg-red-50/5" : "border-gray-200 hover:border-[#B5451B] hover:bg-orange-50/40"
                                         }`}
                                 >
                                     {uploading ? (
@@ -185,6 +241,7 @@ export function ProductModal({
                                     )}
                                 </div>
                             )}
+                            {errors.thumbnail && <p className="text-[10px] font-bold text-red-500 mt-1 uppercase tracking-tight">{errors.thumbnail}</p>}
                             {uploading && (
                                 <p className="text-xs text-[#B5451B] mt-1 flex items-center gap-1">
                                     <Loader2 className="w-3 h-3 animate-spin" /> Uploading...
@@ -218,55 +275,68 @@ export function ProductModal({
                             </button>
                         </div>
                         <div className="space-y-4">
-                            {form.variants.map((v, i) => (
-                                <div key={i} className="border border-gray-200 rounded-xl p-4 relative">
-                                    {form.variants.length > 1 && (
-                                        <button onClick={() => removeVariant(i)}
-                                            className="absolute top-2 right-2 p-1 text-gray-400 hover:text-red-500">
-                                            <X className="w-3.5 h-3.5" />
-                                        </button>
-                                    )}
-                                    <p className="text-xs font-semibold text-gray-500 mb-3">Variant {i + 1}</p>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div>
-                                            <label className="label">Name *</label>
-                                            <input className="input-field" value={v.name}
-                                                onChange={(e) => setVariant(i, "name", e.target.value)} placeholder="500ml" />
+                            {form.variants.map((v, i) => {
+                                const variantErrors = {
+                                    name: errors[`variant_${i}_name`],
+                                    sku: errors[`variant_${i}_sku`],
+                                    price: errors[`variant_${i}_price`],
+                                    stock: errors[`variant_${i}_stock`],
+                                };
+
+                                return (
+                                    <div key={i} className="border border-gray-200 rounded-xl p-4 relative">
+                                        {form.variants.length > 1 && (
+                                            <button onClick={() => removeVariant(i)}
+                                                className="absolute top-2 right-2 p-1 text-gray-400 hover:text-red-500">
+                                                <X className="w-3.5 h-3.5" />
+                                            </button>
+                                        )}
+                                        <p className="text-xs font-semibold text-gray-500 mb-3">Variant {i + 1}</p>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div>
+                                                <label className={`label ${variantErrors.name ? "text-red-500" : ""}`}>Name *</label>
+                                                <input className={`input-field ${variantErrors.name ? "border-red-400" : ""}`} value={v.name}
+                                                    onChange={(e) => setVariant(i, "name", e.target.value)} placeholder="500ml" />
+                                                {variantErrors.name && <p className="text-[10px] font-bold text-red-500 mt-1 uppercase leading-none">{variantErrors.name}</p>}
+                                            </div>
+                                            <div>
+                                                <label className={`label ${variantErrors.sku ? "text-red-500" : ""}`}>SKU *</label>
+                                                <input className={`input-field ${variantErrors.sku ? "border-red-400" : ""}`} value={v.sku}
+                                                    onChange={(e) => setVariant(i, "sku", e.target.value)} placeholder="OIL-500ML" />
+                                                {variantErrors.sku && <p className="text-[10px] font-bold text-red-500 mt-1 uppercase leading-none">{variantErrors.sku}</p>}
+                                            </div>
+                                            <div>
+                                                <label className={`label ${variantErrors.price ? "text-red-500" : ""}`}>Price (৳) *</label>
+                                                <input type="number" className={`input-field ${variantErrors.price ? "border-red-400" : ""}`} value={v.price}
+                                                    onChange={(e) => setVariant(i, "price", Number(e.target.value))} />
+                                                {variantErrors.price && <p className="text-[10px] font-bold text-red-500 mt-1 uppercase leading-none">{variantErrors.price}</p>}
+                                            </div>
+                                            <div>
+                                                <label className="label">Discount Price (৳)</label>
+                                                <input type="number" className="input-field" value={v.discountPrice ?? ""}
+                                                    onChange={(e) => setVariant(i, "discountPrice", e.target.value ? Number(e.target.value) : undefined)} />
+                                            </div>
+                                            <div>
+                                                <label className={`label ${variantErrors.stock ? "text-red-500" : ""}`}>Stock *</label>
+                                                <input type="number" className={`input-field ${variantErrors.stock ? "border-red-400" : ""}`} value={v.stock}
+                                                    onChange={(e) => setVariant(i, "stock", Number(e.target.value))} />
+                                                {variantErrors.stock && <p className="text-[10px] font-bold text-red-500 mt-1 uppercase leading-none">{variantErrors.stock}</p>}
+                                            </div>
+                                            <div>
+                                                <label className="label">Weight (g)</label>
+                                                <input type="number" className="input-field" value={v.weight ?? ""}
+                                                    onChange={(e) => setVariant(i, "weight", e.target.value ? Number(e.target.value) : undefined)} />
+                                            </div>
                                         </div>
-                                        <div>
-                                            <label className="label">SKU *</label>
-                                            <input className="input-field" value={v.sku}
-                                                onChange={(e) => setVariant(i, "sku", e.target.value)} placeholder="OIL-500ML" />
-                                        </div>
-                                        <div>
-                                            <label className="label">Price (৳) *</label>
-                                            <input type="number" className="input-field" value={v.price}
-                                                onChange={(e) => setVariant(i, "price", Number(e.target.value))} />
-                                        </div>
-                                        <div>
-                                            <label className="label">Discount Price (৳)</label>
-                                            <input type="number" className="input-field" value={v.discountPrice ?? ""}
-                                                onChange={(e) => setVariant(i, "discountPrice", e.target.value ? Number(e.target.value) : undefined)} />
-                                        </div>
-                                        <div>
-                                            <label className="label">Stock *</label>
-                                            <input type="number" className="input-field" value={v.stock}
-                                                onChange={(e) => setVariant(i, "stock", Number(e.target.value))} />
-                                        </div>
-                                        <div>
-                                            <label className="label">Weight (g)</label>
-                                            <input type="number" className="input-field" value={v.weight ?? ""}
-                                                onChange={(e) => setVariant(i, "weight", e.target.value ? Number(e.target.value) : undefined)} />
-                                        </div>
+                                        <label className="flex items-center gap-2 mt-3 cursor-pointer">
+                                            <input type="checkbox" checked={v.isAvailable !== false}
+                                                onChange={(e) => setVariant(i, "isAvailable", e.target.checked)}
+                                                className="accent-[#B5451B]" />
+                                            <span className="text-sm text-gray-600">Available for purchase</span>
+                                        </label>
                                     </div>
-                                    <label className="flex items-center gap-2 mt-3 cursor-pointer">
-                                        <input type="checkbox" checked={v.isAvailable !== false}
-                                            onChange={(e) => setVariant(i, "isAvailable", e.target.checked)}
-                                            className="accent-[#B5451B]" />
-                                        <span className="text-sm text-gray-600">Available for purchase</span>
-                                    </label>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
@@ -274,7 +344,7 @@ export function ProductModal({
                 {/* Footer */}
                 <div className="flex items-center justify-end gap-3 px-6 py-4 border-t">
                     <Button variant="outline" onClick={onClose} className="rounded-xl">Cancel</Button>
-                    <Button disabled={saving || uploading} onClick={() => onSave(form)}
+                    <Button disabled={saving || uploading} onClick={handleSave}
                         className="rounded-xl text-white"
                         style={{ background: "linear-gradient(135deg, #B5451B, #D4860A)" }}>
                         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Product"}

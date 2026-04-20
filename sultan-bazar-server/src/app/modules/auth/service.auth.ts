@@ -15,6 +15,47 @@ const registerUser = async (payload: TUser) => {
   return register;
 };
 
+// guest checkout — find-or-create a user with their real email, return access token
+const guestCheckout = async (email: string, fullName: string, phone: string) => {
+  const username = email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '_');
+  const password = config.default_user_pass as string;
+
+  let user = await User.findOne({ email });
+
+  if (!user) {
+    // Create new user with real credentials — password will be hashed by pre-save hook
+    user = await User.create({
+      username,
+      email,
+      contactNumber: phone,
+      password,
+      role: 'user',
+    });
+  }
+
+  // Issue access token
+  const jwtPayload: any = {
+    _id: user._id as string,
+    username: user.username,
+    email: user.email,
+    role: user.role,
+  };
+
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
+  );
+
+  const refreshToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
+  );
+
+  return { accessToken, refreshToken, user: jwtPayload };
+};
+
 // login
 const loginUser = async (payload: TLoginUser) => {
   //
@@ -163,4 +204,5 @@ export const authServices = {
   registerUser,
   changePassword,
   refreshToken,
+  guestCheckout,
 };

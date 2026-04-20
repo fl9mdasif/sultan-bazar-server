@@ -108,6 +108,15 @@ const userApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: [tagTypes.users],
         }),
+
+        // Guest checkout — find-or-create user with real email, return accessToken
+        guestCheckout: build.mutation({
+            query: (data: { email: string; fullName: string; phone: string }) => ({
+                url: "/auth/guest-checkout",
+                method: "POST",
+                data,
+            }),
+        }),
     }),
 });
 
@@ -124,4 +133,5 @@ export const {
     useUpdateAddressMutation,
     useSetDefaultAddressMutation,
     useDeleteAddressMutation,
+    useGuestCheckoutMutation,
 } = userApi;

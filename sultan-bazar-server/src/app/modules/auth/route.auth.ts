@@ -35,5 +35,7 @@ router.post('/logout', authControllers.logoutUser);
 // refresh token
 router.post('/refresh-token', authControllers.refreshToken);
 
+// guest checkout — find-or-create ghost user by phone
+router.post('/guest-checkout', authControllers.guestCheckout);
 
 export const authRoute = router;

@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/s
 import { getUserInfo, removeUser, isLoggedIn } from "@/services/auth.services";
 import { useGetCartQuery } from "@/redux/api/cartApi";
 import Image from "next/image";
+import { useAppSelector } from "@/redux/hooks";
 
 const navLinks = [
     { label: "Home", href: "/" },
@@ -30,10 +31,14 @@ export default function Navbar() {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    const { data: cartData } = useGetCartQuery({});
+    const userIsLoggedIn = isLoggedIn();
+    const { data: cartData } = useGetCartQuery({}, { skip: !userIsLoggedIn });
 
-
-    const cartLength = cartData?.items?.length || 0;
+    // Show local cart count for guests, remote cart count for logged-in users
+    const localCartItems = useAppSelector((state) => state.localCart.items);
+    const cartLength = userIsLoggedIn
+        ? (cartData?.items?.length || 0)
+        : localCartItems.reduce((acc, item) => acc + item.quantity, 0);
 
     useEffect(() => {
         const handler = () => setScrolled(window.scrollY > 10);
@@ -125,7 +130,7 @@ export default function Navbar() {
 
                         {/* Auth — Login / User Avatar */}
                         {loggedIn ? (
-                            <div className="relative hidden sm:block" ref={dropdownRef}>
+                            <div className="relative" ref={dropdownRef}>
                                 <button
                                     onClick={() => setDropdownOpen(!dropdownOpen)}
                                     className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm transition-transform hover:scale-105"
@@ -173,11 +178,11 @@ export default function Navbar() {
                             <Link href="/login">
                                 <Button
                                     size="sm"
-                                    className="hidden cursor-pointer sm:flex items-center gap-1.5 text-white text-sm font-medium rounded-full px-4"
+                                    className="flex items-center gap-1.5 text-white text-xs sm:text-sm font-medium rounded-full px-3 sm:px-4 cursor-pointer"
                                     style={{ background: "#B5451B" }}
                                 >
-                                    <User className="w-4 h-4" />
-                                    <span className="hidden md:block">Login</span>
+                                    <User className="w-3.5 h-3.5 sm:w-4 h-4" />
+                                    <span className="hidden xs:block">Login</span>
                                 </Button>
                             </Link>
                         )}

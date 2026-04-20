@@ -59,22 +59,22 @@ export default function Categories() {
                 {categories.length === 0 ? (
                     <div className="text-center py-10 italic text-gray-400">No categories found.</div>
                 ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 lg:gap-8">
+                    <div className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-6 lg:gap-8">
                         {categories.map((cat: TCategory) => (
                             <Link
                                 key={cat._id}
-                                href={`/products?category=${cat._id}`}
-                                className="group"
+                                href={`/products?category=${cat.name}`}
+                                className="group flex-shrink-0 w-[calc(33.33%-0.75rem)] sm:w-[calc(25%-1rem)] md:w-[calc(20%-1.5rem)] lg:w-[calc(16.66%-2rem)] max-w-[220px]"
                             >
                                 <div
-                                    className="rounded-[2rem] p-8 text-center cursor-pointer border-2 transition-all duration-300 group-hover:border-[#B5451B] group-hover:bg-white group-hover:shadow-2xl group-hover:-translate-y-2"
+                                    className="rounded-2xl sm:rounded-[2rem] p-3 sm:p-6 lg:p-8 text-center cursor-pointer border-2 transition-all duration-300 group-hover:border-[#B5451B] group-hover:bg-white group-hover:shadow-2xl group-hover:-translate-y-2"
                                     style={{
                                         background: "white",
                                         borderColor: "#F0E6D3",
                                     }}
                                 >
                                     <div
-                                        className="w-24 h-24 rounded-3xl overflow-hidden relative mx-auto mb-6 shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-orange-900/5 border border-orange-50"
+                                        className="w-12 h-12 xs:w-16 xs:h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl overflow-hidden relative mx-auto mb-3 sm:mb-6 shadow-sm transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 shadow-orange-900/5 border border-orange-50"
                                         style={{ background: "linear-gradient(135deg, #FEF3CD, #FCE8C3)" }}
                                     >
                                         {cat.thumbnail ? (
@@ -90,10 +90,10 @@ export default function Categories() {
                                             </div>
                                         )}
                                     </div>
-                                    <p className="font-black text-gray-900 text-lg leading-tight mb-2 group-hover:text-[#B5451B]">
+                                    <p className="font-black text-gray-900 text-[10px] xs:text-sm sm:text-base lg:text-lg leading-tight mb-1 sm:mb-2 group-hover:text-[#B5451B] transition-colors">
                                         {cat.name}
                                     </p>
-                                    <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Explore Items →</p>
+                                    <p className="text-gray-400 text-[8px] sm:text-[10px] font-bold uppercase tracking-widest hidden sm:block opacity-0 group-hover:opacity-100 transition-opacity">Explore Items →</p>
                                 </div>
                             </Link>
                         ))}

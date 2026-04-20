@@ -11,7 +11,8 @@ import { toast } from "sonner";
 import { isLoggedIn } from "@/services/auth.services";
 import Link from "next/link";
 import Image from "next/image";
-
+import { useAppDispatch } from "@/redux/hooks";
+import { addItemToLocalCart } from "@/redux/features/localCartSlice";
 
 function Stars({ rating }: { rating: number }) {
     return (
@@ -32,6 +33,8 @@ function ProductCard({ product }: { product: TProduct }) {
     const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
     const [wishlisted, setWishlisted] = useState(false);
     const [addToCart, { isLoading: isAdding }] = useAddToCartMutation();
+    const [localAdding, setLocalAdding] = useState(false);
+    const dispatch = useAppDispatch();
 
     const variant = product.variants[selectedVariantIndex];
     if (!variant) return null;
@@ -52,11 +55,11 @@ function ProductCard({ product }: { product: TProduct }) {
         e.stopPropagation();
 
         if (!isLoggedIn()) {
-            toast.error("Please login to add items to cart");
-            router.push("/login"); // Note: passing state in router.push is not directly supported in Next.js App Router like this, usually handled via query params or session storage if needed, but the user requested state: { from: ... }. 
-            // However, Next.js 'useRouter' push doesn't take state. We might need to use window.sessionStorage or query params.
-            // Let's use query params for simplicity: /login?from=/products
-            router.push("/login?from=/products");
+            // Guest: save to localStorage cart
+            setLocalAdding(true);
+            dispatch(addItemToLocalCart({ product, variant, quantity: 1 }));
+            toast.success(`${product.name} added to cart!`);
+            setTimeout(() => setLocalAdding(false), 600);
             return;
         }
 
@@ -71,6 +74,8 @@ function ProductCard({ product }: { product: TProduct }) {
             toast.error(err?.data?.message || "Failed to add to cart");
         }
     };
+
+    const adding = isAdding || localAdding;
 
     return (
         <Link href={`/products/${product._id}`}>
@@ -185,14 +190,14 @@ function ProductCard({ product }: { product: TProduct }) {
                             onClick={handleAddToCart}
                             className="w-full cursor-pointer text-white font-semibold text-xs rounded-full py-1.5 h-9"
                             style={{ background: "#B5451B" }}
-                            disabled={!inStock || isAdding}
+                            disabled={!inStock || adding}
                         >
-                            {isAdding ? (
+                            {adding ? (
                                 <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" />
                             ) : (
                                 <ShoppingCart className="w-3.5 h-3.5 mr-2" />
                             )}
-                            {isAdding ? "Adding..." : "Add to Cart"}
+                            {adding ? "Adding..." : "Add to Cart"}
                         </Button>
                     </div>
                 </div>

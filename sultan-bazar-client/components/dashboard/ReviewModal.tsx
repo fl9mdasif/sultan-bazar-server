@@ -22,14 +22,14 @@ export function ReviewModal({ isOpen, onClose, productId, productName, orderId, 
     const [addReview, { isLoading }] = useAddReviewMutation();
 
     const handleSubmit = async () => {
-        console.log("Submitting review...", { productId, rating, orderId, variantId });
+        // console.log("Submitting review...", { productId, rating, orderId, variantId });
         if (rating < 1 || rating > 5) {
             toast.error("Please select a rating between 1 and 5 stars.", { position: "top-right" });
             return;
         }
 
         try {
-            console.log("Calling addReview mutation...");
+            // console.log("Calling addReview mutation...");
             const result = await addReview({
                 productId,
                 data: {
@@ -39,7 +39,7 @@ export function ReviewModal({ isOpen, onClose, productId, productName, orderId, 
                 }
             }).unwrap();
 
-            console.log("Review submitted successfully:", result);
+            // console.log("Review submitted successfully:", result);
             toast.success("Review submitted successfully!", { position: "top-right" });
             setRating(0); // Reset rating
             onClose(); // Close the modal

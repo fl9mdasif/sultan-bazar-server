@@ -36,11 +36,11 @@ export default function HealthProducts() {
     }
 
     const handleShop = (id: string) => {
-        if (!isLoggedIn()) {
-            toast.error("Please login to see product details");
-            router.push(`/login?from=/products/${id}`);
-            return;
-        }
+        // if (!isLoggedIn()) {
+        //     toast.error("Please login to see product details");
+        //     router.push(`/login?from=/products/${id}`);
+        //     return;
+        // }
         router.push(`/products/${id}`);
     };
 
