@@ -12,8 +12,8 @@ const app: Application = express();
 
 // parser middleware
 app.use(express.json());
-// app.use(cors());
-// origin: 'http://localhost:5173', // Update with the actual origin of your frontend
+
+
 const allowedOrigins = [
   'http://localhost:3000',
   'https://sultan-bazar.com', // main domain
