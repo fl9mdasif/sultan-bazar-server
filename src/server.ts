@@ -15,8 +15,8 @@ async function main() {
     console.log('Database connected successfully', `${con.connection.host}`);
 
     // console.log("Checking Environment Variables...");
-  console.log("DATABASE_URL process.:", process.env.DATABASE_URL);
-  console.log("DATABASE_URL - config. :", config.database_url);
+  // console.log("DATABASE_URL process.:", process.env.DATABASE_URL);
+  // console.log("DATABASE_URL - config. :", config.database_url);
 
 
     server = app.listen(config.port, () => {

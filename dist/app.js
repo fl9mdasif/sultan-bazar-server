@@ -34,7 +34,7 @@ const corsOptions = {
 };
 // ✅ Preflight OPTIONS request  
 // সঠিক (Express 5 এর জন্য)
-app.options('(.*)', (0, cors_1.default)(corsOptions));
+// app.options('(.*)', cors(corsOptions));
 // ✅ সব middleware এর আগে CORS
 app.use((0, cors_1.default)(corsOptions));
 // ✅ Manual CORS header — CDN বা Firewall bypass  

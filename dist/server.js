@@ -24,8 +24,8 @@ function main() {
             yield (0, db_1.default)();
             console.log('Database connected successfully', `${con.connection.host}`);
             // console.log("Checking Environment Variables...");
-            console.log("DATABASE_URL process.:", process.env.DATABASE_URL);
-            console.log("DATABASE_URL - config. :", config_1.default.database_url);
+            // console.log("DATABASE_URL process.:", process.env.DATABASE_URL);
+            // console.log("DATABASE_URL - config. :", config.database_url);
             server = app_1.default.listen(config_1.default.port, () => {
                 console.log(`Example app listening on port ${config_1.default.port}`);
             });
