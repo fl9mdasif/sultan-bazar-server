@@ -9,6 +9,9 @@ const path_1 = __importDefault(require("path"));
 if (process.env.NODE_ENV !== 'production') {
     dotenv_1.default.config({ path: path_1.default.join(process.cwd(), '.env') });
 }
+else {
+    dotenv_1.default.config();
+}
 // we got everything from .env by config the file
 exports.default = {
     NODE_ENV: process.env.NODE_ENV,
