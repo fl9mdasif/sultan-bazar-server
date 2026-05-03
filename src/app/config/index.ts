@@ -1,9 +1,10 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
-dotenv.config({ path: path.join(process.cwd(), '.env') }); // duita path join kora hoise
-// dotenv.config(//file path )
-
+// Development এ .env file থেকে আসে
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: path.join(process.cwd(), '.env') });
+}
 // we got everything from .env by config the file
 export default {
   NODE_ENV: process.env.NODE_ENV,
