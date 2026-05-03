@@ -1,8 +1,7 @@
 import httpStatus from 'http-status';
 import catchAsync from '../../utils/catchAsync';
 import { response } from '../../utils/sendResponse';
-import { orderServices } from './service.order';
-import { cleanRegex } from 'zod/v4/core/util.cjs';
+import { orderServices } from './service.order'; 
 
 // POST /api/orders  — logged-in user places an order
 const placeOrder = catchAsync(async (req, res) => {
