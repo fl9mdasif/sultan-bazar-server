@@ -4,11 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
+const path_1 = __importDefault(require("path"));
 // Development এ .env file থেকে আসে use for local development and production এ environment variable থেকে আসে
-// if (process.env.NODE_ENV !== 'production') {
-// dotenv.config({ path: path.join(process.  cwd(), '.env') });
-// }
-dotenv_1.default.config();
+if (process.env.NODE_ENV !== 'production') {
+    dotenv_1.default.config({ path: path_1.default.join(process.cwd(), '.env') });
+}
 // we got everything from .env by config the file
 exports.default = {
     NODE_ENV: process.env.NODE_ENV,
