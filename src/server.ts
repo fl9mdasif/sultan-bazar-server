@@ -10,7 +10,7 @@ async function main() {
 
    
    const con= await mongoose.connect(config.database_url as string);
-    seedSuperAdmin();
+    await seedSuperAdmin();
 
     console.log('Database connected successfully', `${con.connection.host}`);
     

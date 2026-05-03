@@ -31,7 +31,8 @@ const corsOptions = {
 };
 
 // ✅ Preflight OPTIONS request  
-app.options('*', cors(corsOptions));
+// সঠিক (Express 5 এর জন্য)
+app.options('(.*)', cors(corsOptions));
 
 // ✅ সব middleware এর আগে CORS
 app.use(cors(corsOptions));

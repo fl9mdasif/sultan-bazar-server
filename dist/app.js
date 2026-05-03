@@ -33,7 +33,8 @@ const corsOptions = {
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With'],
 };
 // ✅ Preflight OPTIONS request  
-app.options('*', (0, cors_1.default)(corsOptions));
+// সঠিক (Express 5 এর জন্য)
+app.options('(.*)', (0, cors_1.default)(corsOptions));
 // ✅ সব middleware এর আগে CORS
 app.use((0, cors_1.default)(corsOptions));
 // ✅ Manual CORS header — CDN বা Firewall bypass  

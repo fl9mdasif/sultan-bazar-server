@@ -4,7 +4,7 @@ import path from 'path';
 // Development এ .env file থেকে আসে use for local development and production এ environment variable থেকে আসে
 
 // if (process.env.NODE_ENV !== 'production') {
-//   dotenv.config({ path: path.join(process.cwd(), '.env') });
+  dotenv.config({ path: path.join(process.  cwd(), '.env') });
 // }
 
 // we got everything from .env by config the file
